@@ -1,0 +1,40 @@
+<html class="h-full bg-bluey-800">
+<%- include('../components/head') %>
+<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+
+<div>
+  <%- include('../components/navigation') %>
+  <main>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+<% if (req.query.success == "true") { %>
+<div class="rounded-md bg-green-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-green-400">Transferred!</p>
+    </div>
+  </div>
+</div>
+<% } %>
+<div class="bg-bluey-700 px-4 py-5 border-b border-bluey-600 rounded-t sm:px-6 mt-8">
+  <h3 class="text-lg leading-6 font-medium text-white">Transfer Coins</h3>
+  <p class="mt-1 text-sm text-bluey-300">You can transfer Coins to other users here.</p>
+</div>
+<div class="bg-bluey-700 rounded-b px-4 py-5 sm:px-6">
+<form action="/cp/giftcoins" method="get">
+  <input type="text" name="id" class="transition ease-in-out delay-100 block w-1/4 flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Discord ID"><br>
+  <input type="text" name="coins" class="transition ease-in-out delay-100 block w-1/4 flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount"><br>
+        <button type="submit" class="transition ease-in-out delay-100 group relative flex w-auto justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none">
+          Transfer
+        </button>
+</form>
+</div>
+      <!-- /End replace -->
+    </div>
+  </main>
+</div>

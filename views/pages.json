@@ -1,0 +1,51 @@
+{
+    "index": "auth.ejs",
+    "notfound": "errors/404.ejs",
+    "redirect": {
+        "callback": "/cp",
+        "failedcallback": "/",
+        "logout": "/",
+        "deleteserver": "/cp",
+        "createserver": "/cp",
+        "failedcreateserver": "/cp/servers/new",
+        "modifyserver": "/cp/servers/edit",
+        "failedmodifyserver": "/cp/servers/edit",
+        "setplan": "/cp/admin",
+        "failedsetplan": "/cp/admin",
+        "getip": "/cp/admin",
+        "failedgetip": "/cp/admin",
+        "createserverdisabled": "/cp?err=disabled",
+        "modifyserverdisabled": "/cp?err=disabled",
+        "deleteserverdisabled": "/cp?err=disabled",
+        "setresources": "/cp/admin",
+        "failedsetresources": "/cp/admin",
+        "setcoins": "/cp/admin",
+        "failedsetcoins": "/cp/admin",
+        "couponcreationfailed": "/cp/admin",
+        "couponcreationsuccess": "/cp/admin",
+        "couponrevokefailed": "/cp/admin",
+        "couponrevokesuccess": "/cp/admin",
+        "removeaccountfailed": "/cp/admin",
+        "removeaccountsuccess": "/cp/admin"
+    },
+    "pages": {
+        "cp": "general/dashboard.ejs",
+        "cp/servers/new": "servers/create.ejs",
+        "cp/servers/edit": "servers/edit.ejs",
+        "cp/admin": "admin/index.ejs",
+        "cp/store": "coins/store.ejs",
+        "cp/earn": "coins/earn.ejs",
+        "cp/transfer": "coins/transfer.ejs",
+        "cp/account": "general/profile.ejs"
+    },
+    "mustbeloggedin": [
+        "/cp",
+        "/cp/servers/new",
+        "/cp/servers/edit",
+        "/cp/admin",
+        "/cp/store",
+        "/cp/earn",
+        "/cp/transfer",
+        "/cp/account"
+    ]
+}

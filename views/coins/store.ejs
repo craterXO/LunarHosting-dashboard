@@ -1,0 +1,132 @@
+<html class="h-full bg-bluey-800">
+<%- include('../components/head') %>
+<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+
+<div>
+  <%- include('../components/navigation') %>
+  <main>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+<% if (req.query.success == "CREATED") { %>
+<div class="rounded-md bg-green-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-green-400">The server has successfully been created.</p>
+    </div>
+  </div>
+</div>
+<% } %>
+<% if (req.query.success == "MODIFIED") { %>
+<div class="rounded-md bg-green-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-green-400">The server has successfully been modified. The changes will appear on the Panel in a few seconds.</p>
+    </div>
+  </div>
+</div>
+<% } %>
+<% if (req.query.err == "none") { %>
+<div class="rounded-md bg-green-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-green-400">Purchase completed!</p>
+    </div>
+  </div>
+</div>
+<% } %>
+<div>
+<% if (req.query.err == "CANNOTAFFORD") { %>
+<div class="rounded-md bg-red-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-red-400">Insufficient Coins balance!</p>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<div>
+
+  <dl class="mt-5 grid grid-cols-1 rounded-lg bg-bluey-700 mb-8 overflow-hidden shadow divide-y divide-bluey-600 md:grid-cols-3 md:divide-y-0 md:divide-x">    <div class="px-4 py-5 sm:p-6">
+      <dt class="text-base font-normal text-bluey-400">Buy RAM ·  <%= settings.api.client.coins.store.ram.cost %> Coins per <%= settings.api.client.coins.store.ram.per/1024 %> GB</dt>
+      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (GB)">
+
+        <button onclick="buyRAM()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
+          →
+        </button>
+                </div>
+      </dd>
+    </div>
+
+    <div class="px-4 py-5 sm:p-6">
+      <dt class="text-base font-normal text-bluey-400">Buy CPU · <%= settings.api.client.coins.store.cpu.cost %> Coins per <%= settings.api.client.coins.store.cpu.per/100 %> Threads</dt>
+      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (Threads)">
+
+        <button onclick="buyCPU()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
+          →
+        </button>
+                </div>
+      </dd>
+    </div>
+
+    <div class="px-4 py-5 sm:p-6">
+      <dt class="text-base font-normal text-bluey-400">Buy Disk · <%= settings.api.client.coins.store.disk.cost %> Coins per <%= settings.api.client.coins.store.disk.per/1024 %> GB</dt>
+      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (GB)">
+
+        <button onclick="buyDisk()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
+          →
+        </button>
+      </div>
+      </dd>
+    </div>
+  </dl>
+</div>
+                                <script>
+                                    async function buyRAM() {
+                                        let amount = encodeURIComponent(document.getElementById("ram").value);
+                                        document.location.href = `/cp/buy?amount=${amount}&type=ram`;
+                                    };
+
+                                    async function buyDisk() {
+                                        let amount = encodeURIComponent(document.getElementById("disk").value);
+                                        document.location.href = `/cp/buy?amount=${amount}&type=disk`;
+                                    };
+
+                                    async function buyCPU() {
+                                        let amount = encodeURIComponent(document.getElementById("cpu").value);
+                                        document.location.href = `/cp/buy?amount=${amount}&type=cpu`;
+                                    };
+                                </script>
+      <!-- /End replace -->
+    </div>
+  </main>
+</div>

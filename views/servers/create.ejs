@@ -1,0 +1,318 @@
+<html class="h-full bg-bluey-800">
+<%- include('../components/head') %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" integrity="sha512-MpdEaY2YQ3EokN6lCD6bnWMl5Gwk7RjBbpKLovlrH6X+DRokrPRAF3zQJl1hZUiLXfo2e9MrOt+udOnHCAmi5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+
+  <style>
+    /* Custom styles for Alertify */
+    .alertify-notifier .ajs-message.ajs-success {
+      background: #323337;
+      color: white;
+      border-radius: 4px;
+    }
+    .alertify-notifier .ajs-message.ajs-error {
+      background: #323337;
+      color: #f87171;
+      border-radius: 4px;
+    }
+    .alertify-notifier.ajs-right {
+      right: 10px;
+    }
+  </style>
+<div>
+  <%- include('../components/navigation') %>
+  <main>
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+               <% if (req.query.err) { %>
+<div class="rounded-md bg-red-800 p-4 mb-8">
+  <div class="flex">
+    <div class="flex-shrink-0">
+      <!-- Heroicon name: solid/information-circle -->
+      <svg class="h-5 w-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+      </svg>
+    </div>
+    <div class="ml-3 flex-1 md:flex md:justify-between">
+      <p class="text-sm text-red-400">
+                        <% if (req.query.err == "MISSINGVARIABLE") { %>
+                            You have not filled out all of the server information.
+                        <% } else if (req.query.err == "ERRORONCREATE") { %>
+                           Failed to create server! This is most likely an issue on <%= settings.name %>'s end, not yours.
+                        <% } else if (req.query.err == "MISSINGEGG") { %>
+                            The server type for this server is not registered as a valid server type, therefore your server's RAM, disk and/or CPU could not be changed.
+                        <% } else { %>
+                            <% if (req.query.num) { %>
+                                <% if (!isNaN(parseFloat(req.query.num))) { %>
+                                    <% if (req.query.err == "TOOLITTLERAM" || req.query.err == "TOOLITTLEDISK" || req.query.err == "TOOLITTLECPU") { %>
+                                        You must make a server with at least <b><%= req.query.num %></b>
+                                        <% if (req.query.err.slice(-3) == "RAM") { %>
+                                            MB RAM
+                                        <% } else if (req.query.err.slice(-4) == "DISK") { %>
+                                            MB disk
+                                        <% } else { // CPU %>
+                                            % CPU
+                                        <% } %>
+                                        if you want to modified a server with the server type you have selected.
+                                    <% } else if (req.query.err == "TOOMUCHRAM" || req.query.err == "TOOMUCHDISK" || req.query.err == "TOOMUCHCPU") { %>
+                                        With the selected server type, you can have a maximum of <b><%= req.query.num %></b>
+                                        <% if (req.query.err.slice(-3) == "RAM") { %>
+                                            MB RAM
+                                        <% } else if (req.query.err.slice(-4) == "DISK") { %>
+                                            MB disk
+                                        <% } else { // CPU %>
+                                            % CPU
+                                        <% } %>
+                                        on the server.
+                                    <% } else if (req.query.err == "EXCEEDRAM" || req.query.err == "EXCEEDDISK" || req.query.err == "EXCEEDCPU") { %>
+                                        The server could not be modified because you have requested to modified a server that exceeds your plan.
+										<% } %>
+									
+									<% } %>
+								<% } else { %>
+									Failed to create server! This is most likely an issue on <%= settings.name %>'s end, not yours.
+								<% } %>
+                                  
+                        <% } %>
+</p>
+    </div>
+  </div>
+</div>
+            <% } %>
+<div>
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-white">Basic Details</h3>
+        <p class="mt-1 text-sm text-bluey-400">This information will be displayed in the server management list on both the Panel and Dashboard.</p>
+      </div>
+    </div>
+    <div class="mt-5 md:col-span-2 md:mt-0">
+      <form action="#" method="POST">
+        <div class="shadow sm:overflow-hidden sm:rounded-md">
+          <div class="space-y-6 bg-bluey-700 px-4 py-5 sm:p-6 rounded-md ">
+            <div class="grid grid-cols-3 gap-6">
+              <div class="col-span-3 sm:col-span-2">
+                <label for="company-website" class="block text-sm font-medium text-bluey-400">Server Label</label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="name" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Example Server">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="hidden sm:block" aria-hidden="true">
+  <div class="py-5">
+    <div class="border-t border-bluey-700/50"></div>
+  </div>
+</div>
+
+<div class="mt-10 sm:mt-0">
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-white">Location</h3>
+        <p class="mt-1 text-sm text-bluey-400">Use the closest location to you. Or if you are running a game server, then the closest location to your users.</p>
+      </div>
+    </div>
+    <div class="mt-5 md:col-span-2 md:mt-0">
+      <form action="#" method="POST">
+        <div class="overflow-hidden shadow sm:rounded-md">
+<div>
+  <ul role="list" class="mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <% for (let [name, value] of Object.entries(settings.api.client.locations)) { %>
+      <li class="col-span-1 flex shadow-sm rounded-md">
+        <div class="flex-shrink-0 flex items-center justify-center w-16 bg-bluey-700 border-t border-b border-l border-bluey-600 text-white text-sm font-medium rounded-l-md"><img src="https://flagsapi.com/<%= value.iso %>/flat/48.png" style="width: 36px; height: 36px;"></div>
+        <div class="flex-1 flex items-center justify-between border-t border-r border-b border-bluey-600 bg-bluey-700 rounded-r-md truncate">
+          <div class="flex-1 px-4 py-2 text-sm truncate">
+            <a onclick="<%= value.code %>()" class="text-white font-medium hover:text-blue-400 cursor-pointer"><%= value.country %></a>
+            <p class="text-bluey-400"><%= value.city %></p>
+          </div>
+        </div>
+      </li>
+  
+      <% } %>
+  </ul>
+</div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="hidden sm:block" aria-hidden="true">
+  <div class="py-5">
+    <div class="border-t border-bluey-700/50"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.js" integrity="sha512-eOUPKZXJTfgptSYQqVilRmxUNYm0XVHwcRHD4mdtCLWf/fC9XWe98IT8H1xzBkLL4Mo9GL0xWMSJtgS5te9rQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  let inputEGGG = ""
+  let inputLOCC = ""
+  
+  <% for (let [name, value] of Object.entries(settings.api.client.eggs)) { %>
+  function <%= name %>() {
+    alertify.set('notifier','position', 'top-right');
+    alertify.success('Selected image: <%= value.display %>');
+    selectedegg = "<%= name %>";
+    // <%= value.display %>
+  }
+  <% } %>
+  
+  // Locations
+  
+  <% for (let [name, value] of Object.entries(settings.api.client.locations)) { %>
+  function <%= value.code %>() {
+    alertify.set('notifier','position', 'top-right');
+    alertify.success('Selected location: <%= value.name %>');
+    selectedlocation = "<%= name %>";
+  }
+  <% } %>
+  
+  </script>
+  
+                                <script>
+                                    async function submitForm() {
+                                        let name = encodeURIComponent(document.getElementById("name").value);
+                                        let egg = selectedegg;
+                                        let ram = encodeURIComponent(document.getElementById("ram").value)*1024;
+                                        let disk = encodeURIComponent(document.getElementById("disk").value*1024);
+                                        let cpu = encodeURIComponent(document.getElementById("cpu").value);
+                                        let location = selectedlocation;
+                                        document.location.href = `/cp/create?name=${name}&egg=${egg}&ram=${ram}&disk=${disk}&cpu=${cpu}&location=${location}`;
+                                    };
+                                </script>
+
+<div class="mt-10 sm:mt-0">
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-white">Image</h3>
+        <p class="mt-1 text-sm text-bluey-400">Decide which image you'd like to use.</p>
+      </div>
+    </div>
+    <div class="mt-5 md:col-span-2 md:mt-0">
+      <form action="#" method="POST">
+        <div class="overflow-hidden shadow sm:rounded-md">
+<div>
+  <ul role="list" class="mt-3 grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <% for (let [name, value] of Object.entries(settings.api.client.eggs)) { %>
+      <li class="col-span-1 flex shadow-sm rounded-md">
+        <div class="flex-shrink-0 flex items-center justify-center w-16 bg-bluey-700 border-t border-b border-l border-bluey-600 text-white text-sm font-medium rounded-l-md"><img src="<%= value.icon %>" style="width: 36px; height: 36px;"></div>
+        <div class="flex-1 flex items-center justify-between border-t border-r border-b border-bluey-600 bg-bluey-700 rounded-r-md truncate cursor-pointer">
+          <div class="flex-1 px-4 py-2 text-sm truncate">
+            <a onclick="<%= name %>()" class="text-white font-medium hover:text-blue-400"><%= value.display %></a>
+            <p class="text-bluey-400"><%= value.type %></p>
+          </div>
+        </div>
+      </li>
+      <% } %>
+  </ul>
+</div>
+</div>
+</div>
+</div>
+
+<div class="hidden sm:block" aria-hidden="true">
+  <div class="py-5">
+    <div class="border-t border-bluey-700/50"></div>
+  </div>
+</div>
+
+<%
+  let ram = 0;
+  let disk = 0;
+  let cpu = 0;
+  let servers = pterodactyl.relationships.servers.data.length;
+    for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
+      ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
+      disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
+      cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
+    }
+%>
+
+<div>
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-white">Resources</h3>
+        <p class="mt-1 text-sm text-bluey-400">Decide how much of your total resource balance should be allocated to this server.</p>
+      </div>
+    </div>
+    <div class="mt-5 md:col-span-2 md:mt-0">
+      <form action="#" method="POST">
+        <div class="shadow sm:overflow-hidden sm:rounded-md">
+          <div class="space-y-6 bg-bluey-700 px-4 py-5 sm:p-6 rounded-md">
+            <div class="grid grid-cols-3 gap-6">
+              <div class="col-span-3 sm:col-span-2">
+                <label for="company-website" class="block text-sm font-medium text-bluey-400">RAM (GB)</label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 %>" value="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 %>">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+              <div class="col-span-3 sm:col-span-2">
+                <label for="company-website" class="block text-sm font-medium text-bluey-400">CPU (%)</label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>" placeholder="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>">
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6">
+              <div class="col-span-3 sm:col-span-2">
+                <label for="company-website" class="block text-sm font-medium text-bluey-400">Disk (GB)</label>
+                <div class="mt-1 flex rounded-md shadow-sm">
+                  <input type="text" name="company-website" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 %>" value="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 %>">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="hidden sm:block" aria-hidden="true">
+  <div class="py-5">
+    <div class="border-t border-bluey-700/50"></div>
+  </div>
+</div>
+
+<div>
+  <div class="md:grid md:grid-cols-3 md:gap-6">
+    <div class="md:col-span-1">
+      <div class="px-4 sm:px-0">
+        <h3 class="text-lg font-medium leading-6 text-white">Confirm Details</h3>
+        <p class="mt-1 text-sm text-bluey-400">Once you are ready, click the Create button.</p>
+      </div>
+    </div>
+    <div class="mt-5 md:col-span-2 md:mt-0">
+        <div class="sm:overflow-hidden sm:rounded-md">
+          <div class="flex justify-end w-full">
+        <button onclick="submitForm()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none">
+          Create
+        </button>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+      <!-- /End replace -->
+    </div>
+  </main>
+</div>
+</body>
