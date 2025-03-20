@@ -1,7 +1,15 @@
+/**
+ * |-| [- |_ | /\ ( ~|~ `/ |_
+ *
+ * Heliactyl 14.11.0 ― Cascade Ridge
+ *
+ * This is for the horrible OAuth2 system that shouldn't be used in production (but it is).
+ * @module oauth2
+*/
+
 "use strict";
 
-const loadConfig = require("../handlers/config");
-const settings = loadConfig("./config.toml");
+const settings = require("../settings.json");
 
 if (settings.api.client.oauth2.link.slice(-1) == "/")
   settings.api.client.oauth2.link = settings.api.client.oauth2.link.slice(
@@ -17,21 +25,19 @@ if (settings.pterodactyl.domain.slice(-1) == "/")
   settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
 
 const fetch = require("node-fetch");
+
 const indexjs = require("../app.js");
-const log = require("../handlers/log");
+const log = require("../misc/log");
 
 const fs = require("fs");
 const { renderFile } = require("ejs");
-const vpnCheck = require("../handlers/vpnCheck");
+// 05/2023: removed - no one used it so this should be removed from oauth
+const vpnCheck = require("../misc/vpnCheck");
 
-/* Ensure platform release target is met */
-const plexactylModule = { "name": "Discord OAuth2", "target_platform": "18.1.x" };
-
-/* Module */
-module.exports.plexactylModule = plexactylModule;
 module.exports.load = async function (app, db) {
-  app.get("/cp/login", async (req, res) => {
+  app.get("/login", async (req, res) => {
     if (req.query.redirect) req.session.redirect = "/" + req.query.redirect;
+    let newsettings = JSON.parse(fs.readFileSync("./settings.json"));
     res.redirect(
       `https://discord.com/api/oauth2/authorize?client_id=${
         settings.api.client.oauth2.id
@@ -39,10 +45,10 @@ module.exports.load = async function (app, db) {
         settings.api.client.oauth2.link +
           settings.api.client.oauth2.callbackpath
       )}&response_type=code&scope=identify%20email${
-        settings.api.client.bot.joinguild.enabled == true
+        newsettings.api.client.bot.joinguild.enabled == true
           ? "%20guilds.join"
           : ""
-      }${settings.api.client.j4r.enabled == true ? "%20guilds" : ""}${
+      }${newsettings.api.client.j4r.enabled == true ? "%20guilds" : ""}${
         settings.api.client.oauth2.prompt == false
           ? "&prompt=none"
           : req.query.prompt
@@ -54,7 +60,7 @@ module.exports.load = async function (app, db) {
     );
   });
 
-  app.get("/cp/logout", (req, res) => {
+  app.get("/logout", (req, res) => {
     let theme = indexjs.get(req);
     req.session.destroy(() => {
       return res.redirect(
@@ -64,7 +70,7 @@ module.exports.load = async function (app, db) {
   });
 
   app.get(settings.api.client.oauth2.callbackpath, async (req, res) => {
-    if (!req.query.code) return res.redirect(`/cp/login`);
+    if (!req.query.code) return res.redirect(`/login`);
     res.send(`
     <!doctype html>
     <html>
@@ -75,22 +81,22 @@ module.exports.load = async function (app, db) {
         <title>Please wait...</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.cdnfonts.com/css/whitney-2" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     </head>
-    <body style="font-family: 'Whitney'" class="bg-[#1e1f23] flex flex-col items-center justify-center min-h-screen">
+    <body style="font-family: 'Inter'" class="bg-zinc-950 flex flex-col items-center justify-center min-h-screen">
         <div class="flex flex-col items-center">
-          <svg class="animate-spin h-8 w-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg class="animate-spin h-8 w-8 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <p class="mt-4 text-gray-300 font-medium text-sm">Working on it...</p>
+          <p class="mt-4 text-gray-500 font-semibold text-sm">Logging in...</p>
         </div>
     </body>
     </html>
 
     <script type="text/javascript" defer>
-      history.pushState('/cp/login', 'Logging in...', '/cp/login')
-      window.location.replace('/cp/submitlogin?code=${encodeURIComponent(
+      history.pushState('/login', 'Logging in...', '/login')
+      window.location.replace('/submitlogin?code=${encodeURIComponent(
         req.query.code.replace(/'/g, "")
       )}')
     </script>
@@ -98,24 +104,26 @@ module.exports.load = async function (app, db) {
     `);
   });
 
-  app.get(`/cp/submitlogin`, async (req, res) => {
+  app.get(`/submitlogin`, async (req, res) => {
     let customredirect = req.session.redirect;
     delete req.session.redirect;
     if (!req.query.code) return res.send("Missing code.");
 
+    const newsettings = require("../settings.json");
+
     let ip =
-      settings.api.client.oauth2.ip["trust x-forwarded-for"] == true
+      newsettings.api.client.oauth2.ip["trust x-forwarded-for"] == true
         ? req.headers["x-forwarded-for"] || req.connection.remoteAddress
         : req.connection.remoteAddress;
     ip = (ip ? ip : "::1")
       .replace(/::1/g, "::ffff:127.0.0.1")
       .replace(/^.*:/, "");
     if (
-      settings.antivpn.status &&
+      newsettings.antivpn.status &&
       ip !== "127.0.0.1" &&
-      !settings.antivpn.whitelistedIPs.includes(ip)
+      !newsettings.antivpn.whitelistedIPs.includes(ip)
     ) {
-      const vpn = await vpnCheck(settings.antivpn.APIKey, db, ip, res);
+      const vpn = await vpnCheck(newsettings.antivpn.APIKey, db, ip, res);
       if (vpn) return;
     }
 
@@ -143,10 +151,10 @@ module.exports.load = async function (app, db) {
       if (scopes.replace(/identify/g, "") == scopes)
         missingscopes.push("identify");
       if (scopes.replace(/email/g, "") == scopes) missingscopes.push("email");
-      if (settings.api.client.bot.joinguild.enabled == true)
+      if (newsettings.api.client.bot.joinguild.enabled == true)
         if (scopes.replace(/guilds.join/g, "") == scopes)
           missingscopes.push("guilds.join");
-      if (settings.api.client.j4r.enabled)
+      if (newsettings.api.client.j4r.enabled)
         if (scopes.replace(/guilds/g, "") == scopes)
           missingscopes.push("guilds");
       if (missingscopes.length !== 0)
@@ -172,21 +180,21 @@ module.exports.load = async function (app, db) {
       });
       let guildsinfo = await guildsjson.json();
       if (userinfo.verified == true) {
-        if (settings.api.client.oauth2.ip.block.includes(ip))
+        if (newsettings.api.client.oauth2.ip.block.includes(ip))
           return res.send(
             "You could not sign in, because your IP has been blocked from signing in."
           );
 
         if (
-          settings.api.client.oauth2.ip["duplicate check"] == true &&
+          newsettings.api.client.oauth2.ip["duplicate check"] == true &&
           ip !== "127.0.0.1"
         ) {
           const ipuser = await db.get(`ipuser-${ip}`);
           if (ipuser && ipuser !== userinfo.id) {
             renderFile(
-              `./themes/${settings.defaulttheme}/alerts/alt.ejs`,
+              `./themes/${newsettings.defaulttheme}/alerts/alt.ejs`,
               {
-                settings: settings,
+                settings: newsettings,
                 db,
                 extra: { home: { name: "VPN Detected" } },
               },
@@ -194,8 +202,7 @@ module.exports.load = async function (app, db) {
               (err, str) => {
                 if (err)
                   return res.send(
-                    'Another account on your IP has been detected, there can only be one account per IP.'
-                    // why was there a mention of discord.gg/halexnodes here?
+                    'Another account on your IP has been detected, there can only be one account per IP. Think this is a mistake? <a href="https://discord.gg/halexnodes" target="_blank">Join our discord.</a>'
                   );
                 res.status(200);
                 res.send(str);
@@ -207,10 +214,10 @@ module.exports.load = async function (app, db) {
           }
         }
 
-        if (settings.api.client.j4r.enabled) {
+        if (newsettings.api.client.j4r.enabled) {
           if (guildsinfo.message == "401: Unauthorized")
             return res.send(
-              "Please allow us to know what servers you are in to let the J4R system work properly. <a href='/cp/login'>Login again</a>"
+              "Please allow us to know what servers you are in to let the J4R system work properly. <a href='/login'>Login again</a>"
             );
           let userj4r = (await db.get(`j4rs-${userinfo.id}`)) ?? [];
           await guildsinfo;
@@ -218,7 +225,7 @@ module.exports.load = async function (app, db) {
           let coins = (await db.get(`coins-${userinfo.id}`)) ?? 0;
 
           // Checking if the user has completed any new j4rs
-          for (const guild of settings.api.client.j4r.ads) {
+          for (const guild of newsettings.api.client.j4r.ads) {
             if (
               guildsinfo.find((g) => g.id === guild.id) &&
               !userj4r.find((g) => g.id === guild.id)
@@ -243,15 +250,15 @@ module.exports.load = async function (app, db) {
           await db.set(`coins-${userinfo.id}`, coins);
         }
 
-        if (settings.api.client.bot.joinguild.enabled == true) {
-          if (typeof settings.api.client.bot.joinguild.guildid == "string") {
+        if (newsettings.api.client.bot.joinguild.enabled == true) {
+          if (typeof newsettings.api.client.bot.joinguild.guildid == "string") {
             await fetch(
-              `https://discord.com/api/guilds/${settings.api.client.bot.joinguild.guildid}/members/${userinfo.id}`,
+              `https://discord.com/api/guilds/${newsettings.api.client.bot.joinguild.guildid}/members/${userinfo.id}`,
               {
                 method: "put",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bot ${settings.api.client.bot.token}`,
+                  Authorization: `Bot ${newsettings.api.client.bot.token}`,
                 },
                 body: JSON.stringify({
                   access_token: codeinfo.access_token,
@@ -259,17 +266,17 @@ module.exports.load = async function (app, db) {
               }
             );
           } else if (
-            typeof settings.api.client.bot.joinguild.guildid == "object"
+            typeof newsettings.api.client.bot.joinguild.guildid == "object"
           ) {
-            if (Array.isArray(settings.api.client.bot.joinguild.guildid)) {
-              for (let guild of settings.api.client.bot.joinguild.guildid) {
+            if (Array.isArray(newsettings.api.client.bot.joinguild.guildid)) {
+              for (let guild of newsettings.api.client.bot.joinguild.guildid) {
                 await fetch(
                   `https://discord.com/api/guilds/${guild}/members/${userinfo.id}`,
                   {
                     method: "put",
                     headers: {
                       "Content-Type": "application/json",
-                      Authorization: `Bot ${settings.api.client.bot.token}`,
+                      Authorization: `Bot ${newsettings.api.client.bot.token}`,
                     },
                     body: JSON.stringify({
                       access_token: codeinfo.access_token,
@@ -290,18 +297,18 @@ module.exports.load = async function (app, db) {
         }
 
         //give role on login
-        if (settings.api.client.bot.giverole.enabled == true) {
+        if (newsettings.api.client.bot.giverole.enabled == true) {
           if (
-            typeof settings.api.client.bot.giverole.guildid == "string" &&
-            typeof settings.api.client.bot.giverole.roleid == "string"
+            typeof newsettings.api.client.bot.giverole.guildid == "string" &&
+            typeof newsettings.api.client.bot.giverole.roleid == "string"
           ) {
             await fetch(
-              `https://discord.com/api/guilds/${settings.api.client.bot.giverole.guildid}/members/${userinfo.id}/roles/${settings.api.client.bot.giverole.roleid}`,
+              `https://discord.com/api/guilds/${newsettings.api.client.bot.giverole.guildid}/members/${userinfo.id}/roles/${newsettings.api.client.bot.giverole.roleid}`,
               {
                 method: "put",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: `Bot ${settings.api.client.bot.token}`,
+                  Authorization: `Bot ${newsettings.api.client.bot.token}`,
                 },
               }
             );
@@ -313,12 +320,12 @@ module.exports.load = async function (app, db) {
         }
 
         // Applying role packages
-        if (settings.api.client.packages.rolePackages.roles) {
+        if (newsettings.api.client.packages.rolePackages.roles) {
           const member = await fetch(
-            `https://discord.com/api/v9/guilds/${settings.api.client.packages.rolePackages.roleServer}/members/${userinfo.id}`,
+            `https://discord.com/api/v9/guilds/${newsettings.api.client.packages.rolePackages.roleServer}/members/${userinfo.id}`,
             {
               headers: {
-                Authorization: `Bot ${settings.api.client.bot.token}`,
+                Authorization: `Bot ${newsettings.api.client.bot.token}`,
               },
             }
           );
@@ -327,31 +334,31 @@ module.exports.load = async function (app, db) {
             const currentpackage = await db.get(`package-${userinfo.id}`);
             if (
               Object.values(
-                settings.api.client.packages.rolePackages.roles
+                newsettings.api.client.packages.rolePackages.roles
               ).includes(currentpackage)
             ) {
               for (const rolePackage of Object.keys(
-                settings.api.client.packages.rolePackages.roles
+                newsettings.api.client.packages.rolePackages.roles
               )) {
                 if (
-                  settings.api.client.packages.rolePackages.roles[
+                  newsettings.api.client.packages.rolePackages.roles[
                     rolePackage
                   ] === currentpackage
                 ) {
                   if (!memberinfo.roles.includes(rolePackage)) {
                     await db.set(
                       `package-${userinfo.id}`,
-                      settings.api.client.packages.default
+                      newsettings.api.client.packages.default
                     );
                   }
                 }
               }
             }
             for (const role of memberinfo.roles) {
-              if (settings.api.client.packages.rolePackages.roles[role]) {
+              if (newsettings.api.client.packages.rolePackages.roles[role]) {
                 await db.set(
                   `package-${userinfo.id}`,
-                  settings.api.client.packages.rolePackages.roles[role]
+                  newsettings.api.client.packages.rolePackages.roles[role]
                 );
               }
             }
@@ -359,11 +366,11 @@ module.exports.load = async function (app, db) {
         }
 
         if (!(await db.get("users-" + userinfo.id))) {
-          if (settings.api.client.allow.newusers == true) {
+          if (newsettings.api.client.allow.newusers == true) {
             let genpassword = null;
-            if (settings.api.client.passwordgenerator.signup == true)
+            if (newsettings.api.client.passwordgenerator.signup == true)
               genpassword = makeid(
-                settings.api.client.passwordgenerator["length"]
+                newsettings.api.client.passwordgenerator["length"]
               );
             let accountjson = await fetch(
               settings.pterodactyl.domain + "/api/application/users",
@@ -472,7 +479,7 @@ module.exports.load = async function (app, db) {
         "Not verified a Discord account. Please verify the email on your Discord account."
       );
     } else {
-      res.redirect(`/cp/login`);
+      res.redirect(`/login`);
     }
   });
 };

@@ -1,0 +1,85 @@
+<html class="h-full">
+
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-900" style="font-family: 'Inter'">
+  <div class="flex min-h-full">
+    <div class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+      <div class="mx-auto w-full max-w-sm lg:w-96">
+        <div>
+          <span class="text-indigo-400 text-lg font-semibold tracking-tight mt-2 mb-2"><%= settings.name %></span>
+          <h2 class="mt-6 text-3xl font-semibold tracking-tight text-white">Select an account</h2>
+          <p class="mt-2 text-sm text-slate-400">
+            Choose which account you'd like to use for this session
+          </p>
+        </div>
+
+        <div class="mt-10">
+          <div class="space-y-4">
+            <!-- Current account -->
+            <a href="../dashboard" class="transition block w-full rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 hover:bg-slate-800 hover:border-slate-700">
+              <div class="flex items-center">
+                <img class="h-10 w-10 rounded-lg" src="https://cdn.discordapp.com/avatars/<%= userinfo.id %>/<%= userinfo.avatar %>?size=256" alt="User avatar">
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-white"><%= req.session.userinfo.global_name %></p>
+                  <p class="text-xs text-slate-400"><%= req.session.userinfo.username %></p>
+                </div>
+                <div class="ml-auto">
+                  <span class="inline-flex items-center rounded-md bg-indigo-500/10 px-2 py-1 text-xs font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
+                    Current
+                  </span>
+                </div>
+              </div>
+            </a>
+            
+            <!-- Add account button -->
+            <a href="../login" class="transition block w-full rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 hover:bg-slate-800 hover:border-slate-700">
+              <div class="flex items-center">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-300">
+                    <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-medium text-white">Add a new account</p>
+                  <p class="text-xs text-slate-400">Connect with Discord</p>
+                </div>
+                <div class="ml-auto">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500">
+                    <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 0 1 .02-1.06L11.168 10 7.23 6.29a.75.75 0 1 1 1.04-1.08l4.5 4.25a.75.75 0 0 1 0 1.08l-4.5 4.25a.75.75 0 0 1-1.06-.02Z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </a>
+            
+            <!-- Back to dashboard -->
+            <div class="mt-8 text-center">
+              <a href="../dashboard" class="text-sm text-slate-400 hover:text-indigo-400 transition">
+                Return to dashboard
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="relative hidden w-0 flex-1 lg:block">
+      <div class="absolute inset-0 h-full w-full bg-gradient-to-br from-indigo-600/20 to-purple-800/20"></div>
+      <img class="absolute inset-0 h-full w-full object-cover rounded-l-3xl opacity-20 mix-blend-overlay" src="../assets/loginBackground.png" alt="">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="max-w-md p-8">
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

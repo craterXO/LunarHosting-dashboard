@@ -1,5 +1,4 @@
-const loadConfig = require("../handlers/config");
-const settings = loadConfig("./config.toml");
+const settings = require('../settings.json')
 const fetch = require('node-fetch')
 
 /**
@@ -23,8 +22,11 @@ module.exports = (action, message) => {
                     title: `Event: \`${action}\``,
                     description: message,
                     author: {
-                        name: 'Logging'
+                        name: 'Heliactyl Logging'
                     },
+                    thumbnail: {
+                        url: 'https://atqr.pages.dev/favicon.png' // This is the default Heliactyl logo, you can change it if you want.
+                    }
                 }
             ]
         })

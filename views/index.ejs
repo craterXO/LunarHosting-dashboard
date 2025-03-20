@@ -1,0 +1,147 @@
+<html class="h-full">
+
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-900" style="font-family: 'Inter'">
+  <!-- Maintenance Modal -->
+  <div id="maintenanceModal" class="relative z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm transition-opacity"></div>
+    <div class="fixed inset-0 z-50 w-screen overflow-y-auto">
+      <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 border border-slate-700/50">
+          <div class="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+            <button type="button" onclick="closeMaintenanceModal()" class="rounded-lg bg-slate-800 p-1 text-slate-400 hover:text-slate-200 focus:outline-none transition">
+              <span class="sr-only">Close</span>
+              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          
+          <div class="text-center">
+            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-yellow-500/20 to-red-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-yellow-500">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            <div class="mt-4">
+              <h3 class="text-xl font-semibold leading-6 text-white" id="modal-title">Under Maintenance</h3>
+              <div class="mt-4">
+                <p class="text-sm text-slate-300"><%= settings.maintenance.message %></p>
+                <div class="mt-4 rounded-lg bg-slate-800/50 p-3 border border-slate-700/50">
+                  <div class="flex items-center justify-center">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <p class="ml-2 text-xs text-slate-400">Our team is working hard to improve your experience. We'll be back shortly.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button type="button" onclick="closeMaintenanceModal()" 
+              class="inline-flex w-full sm:w-auto justify-center rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-indigo-400 hover:to-indigo-500 transition">
+              Got it
+            </button>
+            <a href="https://discord.gg/your-discord" target="_blank" 
+              class="inline-flex w-full sm:w-auto justify-center items-center rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="mr-2 text-slate-300">
+                <path fill="currentColor" d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09-.01-.02-.04-.03-.07-.03-1.5.26-2.93.71-4.27 1.33-.01 0-.02.01-.03.02-2.72 4.07-3.47 8.03-3.1 11.95 0 .02.01.04.03.05 1.8 1.32 3.53 2.12 5.24 2.65.03.01.06 0 .07-.02.4-.55.76-1.13 1.07-1.74.02-.04 0-.08-.04-.09-.57-.22-1.11-.48-1.64-.78-.04-.02-.04-.08-.01-.11.11-.08.22-.17.33-.25.02-.02.05-.02.07-.01 3.44 1.57 7.15 1.57 10.55 0 .02-.01.05-.01.07.01.11.09.22.17.33.26.04.03.04.09-.01.11-.52.31-1.07.56-1.64.78-.04.01-.05.06-.04.09.32.61.68 1.19 1.07 1.74.03.02.06.03.09.02 1.72-.53 3.45-1.33 5.25-2.65.02-.01.03-.03.03-.05.44-4.53-.73-8.46-3.1-11.95-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/>
+              </svg>
+              Join Discord
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex min-h-full">
+    <div class="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+      <div class="mx-auto w-full max-w-sm lg:w-96">
+        <div>
+          <img src="/assets/AstraDesk.png" alt="Logo" class="w-[200px] h-auto object-contain mb-6">
+          <h2 class="mt-6 text-3xl font-semibold tracking-tight text-white">Welcome back</h2>
+          <p class="mt-2 text-sm text-slate-400">
+            Sign in to your account to continue
+          </p>
+        </div>
+
+        <div class="mt-10">
+          <div class="space-y-4">
+            <!-- Discord login button -->
+            <a href="<%= settings.maintenance.enabled ? '#' : '../login' %>" 
+               onclick="<%= settings.maintenance.enabled ? 'showMaintenanceModal(event)' : '' %>" 
+               class="transition flex items-center justify-center gap-3 w-full rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 hover:bg-slate-800 hover:border-slate-700 text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="text-slate-300">
+                <path fill="currentColor" d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09-.01-.02-.04-.03-.07-.03-1.5.26-2.93.71-4.27 1.33-.01 0-.02.01-.03.02-2.72 4.07-3.47 8.03-3.1 11.95 0 .02.01.04.03.05 1.8 1.32 3.53 2.12 5.24 2.65.03.01.06 0 .07-.02.4-.55.76-1.13 1.07-1.74.02-.04 0-.08-.04-.09-.57-.22-1.11-.48-1.64-.78-.04-.02-.04-.08-.01-.11.11-.08.22-.17.33-.25.02-.02.05-.02.07-.01 3.44 1.57 7.15 1.57 10.55 0 .02-.01.05-.01.07.01.11.09.22.17.33.26.04.03.04.09-.01.11-.52.31-1.07.56-1.64.78-.04.01-.05.06-.04.09.32.61.68 1.19 1.07 1.74.03.02.06.03.09.02 1.72-.53 3.45-1.33 5.25-2.65.02-.01.03-.03.03-.05.44-4.53-.73-8.46-3.1-11.95-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/>
+              </svg>
+              Sign in with Discord
+            </a>
+            
+            <!-- Discord info text -->
+            <div class="flex items-center mt-4 text-xs text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-indigo-400 mr-2 flex-shrink-0">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clip-rule="evenodd" />
+              </svg>
+              We use Discord for authentication to provide a seamless and secure login experience.
+            </div>
+            
+            <!-- Decorative divider -->
+            <div class="relative my-6">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-slate-700/30"></div>
+              </div>
+              <div class="relative flex justify-center text-xs">
+                <span class="bg-slate-900 px-2 text-slate-500">Secure authentication</span>
+              </div>
+            </div>
+            
+            <!-- Footer info -->
+            <div class="mt-8 text-center">
+              <p class="text-xs text-slate-500">
+                © 2025 <%= settings.name %>. All rights reserved.
+              </p>
+              <p class="text-xs text-slate-500 mt-1">
+                Powered by <a href="https://github.com/AstraDesk/AstraDesk" class="text-slate-400 hover:text-indigo-400 transition">AstraDesk</a>
+                <span class="text-slate-500">Version <%= settings.version %></span>
+              </p>
+              <p class="text-xs text-slate-500 mt-1">
+                Developed by <a href="https://github.com/Crazy-Devs" class="text-slate-400 hover:text-indigo-400 transition">Crater</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="relative hidden w-0 flex-1 lg:block">
+      <div class="absolute inset-0 h-full w-full bg-gradient-to-br from-indigo-600/20 to-purple-800/20"></div>
+      <img class="absolute inset-0 h-full w-full object-cover rounded-l-3xl opacity-20 mix-blend-overlay" src="../assets/loginBackground.png" alt="">
+    </div>
+  </div>
+
+  <script>
+    function showMaintenanceModal(event) {
+      event.preventDefault();
+      document.getElementById('maintenanceModal').classList.remove('hidden');
+    }
+
+    function closeMaintenanceModal() {
+      document.getElementById('maintenanceModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

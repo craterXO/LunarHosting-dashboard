@@ -1,6 +1,1 @@
-config.toml
 node_modules/
-.vscode/
-package-lock.json
-database.sqlite
-viewsold/

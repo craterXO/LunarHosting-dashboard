@@ -1,132 +1,273 @@
-<html class="h-full bg-bluey-800">
-<%- include('../components/head') %>
-<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <link rel="stylesheet" href="../assets/tailwind.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
 
-<div>
-  <%- include('../components/navigation') %>
-  <main>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-<% if (req.query.success == "CREATED") { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">The server has successfully been created.</p>
-    </div>
-  </div>
-</div>
-<% } %>
-<% if (req.query.success == "MODIFIED") { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">The server has successfully been modified. The changes will appear on the Panel in a few seconds.</p>
-    </div>
-  </div>
-</div>
-<% } %>
-<% if (req.query.err == "none") { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">Purchase completed!</p>
-    </div>
-  </div>
-</div>
-<% } %>
-<div>
-<% if (req.query.err == "CANNOTAFFORD") { %>
-<div class="rounded-md bg-red-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-red-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-red-400">Insufficient Coins balance!</p>
-    </div>
-  </div>
-</div>
-<% } %>
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
 
-<div>
-
-  <dl class="mt-5 grid grid-cols-1 rounded-lg bg-bluey-700 mb-8 overflow-hidden shadow divide-y divide-bluey-600 md:grid-cols-3 md:divide-y-0 md:divide-x">    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">Buy RAM ·  <%= settings.api.client.coins.store.ram.cost %> Coins per <%= settings.api.client.coins.store.ram.per/1024 %> GB</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (GB)">
-
-        <button onclick="buyRAM()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
-          →
-        </button>
+<body class="bg-zinc-950 text-zinc-100" style="font-family: 'Inter', sans-serif;">
+  <div>
+    <%- include('../components/navigation') %>
+    <div class="md:pl-64 flex flex-col flex-1">
+      <main class="flex-1">
+        <div class="py-6">
+          <%- include('../components/skeleton') %>
+          <div class="hidden max-w-7xl mx-auto px-4 sm:px-6 md:px-8" id="content">
+            <!-- Header -->
+            <div class="pt-2 sm:pt-6 md:pt-8">
+              <div class="relative rounded-xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border border-zinc-700/30 shadow-lg mb-6 overflow-hidden">
+                <div class="px-4 sm:px-8 py-6 sm:py-8">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center">
+                        <div class="bg-zinc-800/50 rounded-xl p-3 border border-zinc-800/50">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                            <path d="M20.91 8.84 8.56 2.23a1.93 1.93 0 0 0-1.81 0L3.1 4.13a2.12 2.12 0 0 0-.05 3.69l12.22 6.93a2 2 0 0 0 1.94 0L21 12.51a2.12 2.12 0 0 0-.09-3.67Z"/>
+                            <path d="m3.09 8.84 12.35-6.61a1.93 1.93 0 0 1 1.81 0l3.65 1.9a2.12 2.12 0 0 1 .1 3.69L8.73 14.75a2 2 0 0 1-1.94 0L3 12.51a2.12 2.12 0 0 1 .09-3.67Z"/>
+                            <line x1="12" y1="22" x2="12" y2="13"/>
+                          </svg>
+                        </div>
+                        <div class="ml-4">
+                          <h2 class="text-xl font-semibold text-zinc-200 tracking-tight">Resource Store</h2>
+                          <p class="text-sm text-zinc-400">Purchase additional resources for your servers</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-      </dd>
-    </div>
+              </div>
+            </div>
 
-    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">Buy CPU · <%= settings.api.client.coins.store.cpu.cost %> Coins per <%= settings.api.client.coins.store.cpu.per/100 %> Threads</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (Threads)">
-
-        <button onclick="buyCPU()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
-          →
-        </button>
+            <!-- Alerts -->
+            <% if (req.query.err) { %>
+              <% if (req.query.err == "none") { %>
+                <div class="rounded-xl bg-zinc-900/70 border border-zinc-800/50 p-4 mb-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-zinc-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-md font-medium text-zinc-200">Resources purchased</h3>
+                      <p class="mt-1 text-sm text-zinc-400">You can now edit one of your servers and add the extra resources.</p>
+                    </div>
+                  </div>
                 </div>
-      </dd>
+              <% } else { %>
+                <div class="rounded-xl bg-zinc-900/70 border border-zinc-800/50 p-4 mb-6">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg class="h-5 w-5 text-zinc-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-md font-medium text-zinc-200">An error occurred</h3>
+                      <p class="mt-1 text-sm text-zinc-400">Error code: <code><%= req.query.err %></code></p>
+                    </div>
+                  </div>
+                </div>
+              <% } %>
+            <% } %>
+
+            <!-- Store Items Grid -->
+            <div class="grid grid-cols-1 gap-3 sm:gap-4">
+              <!-- RAM -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <path d="M6 19v-3"/>
+                    <path d="M10 19v-3"/>
+                    <path d="M14 19v-3"/>
+                    <path d="M18 19v-3"/>
+                    <path d="M8 11V9"/>
+                    <path d="M16 11V9"/>
+                    <path d="M12 11V9"/>
+                    <path d="M2 15h20"/>
+                    <path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.1a2 2 0 0 0 0-3.837Z"/>
+                  </svg>
+                </div>
+                <div class="relative p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Memory</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    <%= settings.api.client.coins.store.ram.per/1024 %> GiB per <%= settings.api.client.coins.store.ram.cost %> coin<%= settings.api.client.coins.store.ram.cost == 1 ? "" : "s" %>
+                  </p>
+
+                  <form action="javascript:void(0);" class="mt-6 space-y-4">
+                    <div class="relative">
+                      <select id="ram" name="amount" class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <% for(let i = 1; i <= 10; i++) { %>
+                          <option value="<%= i %>">
+                            <%= settings.api.client.coins.store.ram.per/1024 * i %> GiB - <%= settings.api.client.coins.store.ram.cost * i %> coins
+                          </option>
+                        <% } %>
+                      </select>
+                    </div>
+                    
+                    <button onclick="buyRAM()" type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Purchase Memory
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- CPU -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                    <rect x="9" y="9" width="6" height="6"></rect>
+                    <line x1="9" y1="1" x2="9" y2="4"></line>
+                    <line x1="15" y1="1" x2="15" y2="4"></line>
+                    <line x1="9" y1="20" x2="9" y2="23"></line>
+                    <line x1="15" y1="20" x2="15" y2="23"></line>
+                    <line x1="20" y1="9" x2="23" y2="9"></line>
+                    <line x1="20" y1="14" x2="23" y2="14"></line>
+                    <line x1="1" y1="9" x2="4" y2="9"></line>
+                    <line x1="1" y1="14" x2="4" y2="14"></line>
+                  </svg>
+                </div>
+                <div class="relative p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">CPU</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    <%= settings.api.client.coins.store.cpu.per/100 %> Core per <%= settings.api.client.coins.store.cpu.cost %> coin<%= settings.api.client.coins.store.cpu.cost == 1 ? "" : "s" %>
+                  </p>
+
+                  <form action="javascript:void(0);" class="mt-6 space-y-4">
+                    <div class="relative">
+                      <select id="cpu" name="amount" class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <% for(let i = 1; i <= 10; i++) { %>
+                          <option value="<%= i %>">
+                            <%= settings.api.client.coins.store.cpu.per/100 * i %> Cores - <%= settings.api.client.coins.store.cpu.cost * i %> coins
+                          </option>
+                        <% } %>
+                      </select>
+                    </div>
+                    
+                    <button onclick="buyCPU()" type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Purchase CPU
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Storage -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <path d="M21 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/>
+                    <path d="M14 15V9"/>
+                    <path d="M10 15V9"/>
+                    <path d="M6 15V9"/>
+                    <path d="M18 15V9"/>
+                  </svg>
+                </div>
+                <div class="relative p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Storage</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    <%= settings.api.client.coins.store.disk.per/1024 %> GiB per <%= settings.api.client.coins.store.disk.cost %> coin<%= settings.api.client.coins.store.disk.cost == 1 ? "" : "s" %>
+                  </p>
+
+                  <form action="javascript:void(0);" class="mt-6 space-y-4">
+                    <div class="relative">
+                      <select id="disk" name="amount" class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <% for(let i = 1; i <= 10; i++) { %>
+                          <option value="<%= i %>">
+                            <%= settings.api.client.coins.store.disk.per/1024 * i %> GiB - <%= settings.api.client.coins.store.disk.cost * i %> coins
+                          </option>
+                        <% } %>
+                      </select>
+                    </div>
+                    
+                    <button onclick="buyDisk()" type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Purchase Storage
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Servers -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                  </svg>
+                </div>
+                <div class="relative p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Servers</h3>
+                  <p class="mt-1 text-sm text-zinc-400">
+                    <%= settings.api.client.coins.store.servers.per %> Slots per <%= settings.api.client.coins.store.servers.cost %> coin<%= settings.api.client.coins.store.servers.cost == 1 ? "" : "s" %>
+                  </p>
+
+                  <form action="javascript:void(0);" class="mt-6 space-y-4">
+                    <div class="relative">
+                      <select id="servers" name="amount" class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg px-4 py-2.5 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <% for(let i = 1; i <= 10; i++) { %>
+                          <option value="<%= i %>">
+                            <%= settings.api.client.coins.store.servers.per * i %> Slots - <%= settings.api.client.coins.store.servers.cost * i %> coins
+                          </option>
+                        <% } %>
+                      </select>
+                    </div>
+                    
+                    <button onclick="buyServers()" type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Purchase Slots
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <%- include('../components/footer') %>
     </div>
+  </div>
 
-    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">Buy Disk · <%= settings.api.client.coins.store.disk.cost %> Coins per <%= settings.api.client.coins.store.disk.per/1024 %> GB</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="Amount (GB)">
+  <script>
+  function buyRAM() {
+    const amount = document.getElementById('ram').value;
+    window.location.href = `/buy?type=ram&amount=${amount}`;
+  }
 
-        <button onclick="buyDisk()" class="transition ease-in-out delay-100 group relative flex w-1/4 justify-center rounded-md border border-transparent bg-blue-400 py-2 px-4 text-sm font-medium text-white hover:bg-blue-500 focus:outline-none ml-2 ">
-          →
-        </button>
-      </div>
-      </dd>
-    </div>
-  </dl>
-</div>
-                                <script>
-                                    async function buyRAM() {
-                                        let amount = encodeURIComponent(document.getElementById("ram").value);
-                                        document.location.href = `/cp/buy?amount=${amount}&type=ram`;
-                                    };
+  function buyCPU() {
+    const amount = document.getElementById('cpu').value;
+    window.location.href = `/buy?type=cpu&amount=${amount}`;
+  }
 
-                                    async function buyDisk() {
-                                        let amount = encodeURIComponent(document.getElementById("disk").value);
-                                        document.location.href = `/cp/buy?amount=${amount}&type=disk`;
-                                    };
+  function buyDisk() {
+    const amount = document.getElementById('disk').value;
+    window.location.href = `/buy?type=disk&amount=${amount}`;
+  }
 
-                                    async function buyCPU() {
-                                        let amount = encodeURIComponent(document.getElementById("cpu").value);
-                                        document.location.href = `/cp/buy?amount=${amount}&type=cpu`;
-                                    };
-                                </script>
-      <!-- /End replace -->
-    </div>
-  </main>
-</div>
+  function buyServers() {
+    const amount = document.getElementById('servers').value;
+    window.location.href = `/buy?type=servers&amount=${amount}`;
+  }
+  </script>
+</body>

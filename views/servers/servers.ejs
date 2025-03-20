@@ -1,0 +1,259 @@
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-zinc-950" style="font-family: 'Inter', sans-serif;">
+  <%- include('../components/navigation') %>
+  <div class="md:pl-64 flex flex-col flex-1 h-screen">
+    <main class="flex-1 flex flex-col">
+      <!-- Top Adspace -->
+      <div class="flex justify-center w-full px-4 sm:px-6 md:px-8 py-4">
+        <div class="w-full max-w-7xl rounded-xl bg-zinc-900/70 border border-zinc-800/50 p-4 text-center">
+          <div class="text-sm text-zinc-400">Advertisement</div>
+          <!-- Ad content goes here -->
+        </div>
+      </div>
+
+      <div class="flex-1 py-6">
+        <% /* Skeleton loader, lasts about 0.3s to let the page content load */ %>
+        <%- include('../components/skeleton') %>
+        <div class="hidden max-w-7xl pt-8 mx-auto px-4 sm:px-6 md:px-8" id="content">
+          <div class="lg:flex lg:items-center lg:justify-between mb-8">
+            <div class="min-w-0 flex-1">
+              <div class="flex">
+                <div class="relative">
+                  <div class="bg-zinc-800/70 rounded-xl h-12 w-12 text-center flex text-zinc-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 m-auto">
+                      <path d="M4.08 5.227A3 3 0 0 1 6.979 3H17.02a3 3 0 0 1 2.9 2.227l2.113 7.926A5.228 5.228 0 0 0 18.75 12H5.25a5.228 5.228 0 0 0-3.284 1.153L4.08 5.227Z" />
+                      <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 1 0 0 7.5h13.5a3.75 3.75 0 1 0 0-7.5H5.25Zm10.5 4.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm3.75-.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="relative ml-4">
+                  <h2 class="text-xl font-semibold text-zinc-200 sm:truncate tracking-tight">Servers</h2>
+                  <p class="text-xs font-light text-zinc-400">View a list of servers on your account.</p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-5 flex lg:ml-4 lg:mt-0">
+              <span class="sm:ml-3 mr-3">
+                <a href="../servers/new" class="inline-flex items-center rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all duration-200">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="-ml-0.5 mr-2 h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  Deploy Server
+                </a>
+              </span>
+            </div>
+          </div>
+          
+          <% if (req.query.err && req.query.err == "CREATED") { %>
+          <div class="rounded-xl bg-zinc-800/50 border border-zinc-700/30 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-md font-medium tracking-tight text-zinc-200">Server deployed</h3>
+                <div class="mt-1 text-sm text-zinc-400">
+                  <p>Please allow it a few minutes to install the requested software. You can manage your server via the Panel.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+          
+          <% if (req.query.err && req.query.err == "MODIFIED") { %>
+          <div class="rounded-xl bg-zinc-800/50 border border-zinc-700/30 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-md font-medium tracking-tight text-zinc-200">Server resources changed</h3>
+                <div class="mt-1 text-sm text-zinc-400">
+                  <p>Please restart your server to ensure it can use the new resource limits.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+          
+          <% if (req.query.err && req.query.err == "DELETED") { %>
+          <div class="rounded-xl bg-zinc-800/50 border border-zinc-700/30 p-4 mb-6">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-md font-medium tracking-tight text-zinc-200">Server deleted</h3>
+                <div class="mt-1 text-sm text-zinc-400">
+                  <p>The server was successfully deleted from the Panel. All resources have been refunded.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% } %>
+          
+          <% if (pterodactyl.relationships.servers.data.length == 0) { %>
+          <div class="text-center md:mt-[30vh]">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mx-auto h-12 w-12 text-zinc-600">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z" />
+            </svg>
+            <h3 class="mt-4 text-md font-semibold tracking-tight text-zinc-200">Create your first server</h3>
+            <p class="mt-1 text-xs text-zinc-400">You can deploy a server in just a few seconds.</p>
+            <div class="mt-6">
+              <a href="../servers/new" type="button" class="transition inline-flex items-center rounded-xl bg-zinc-800/70 px-6 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="-ml-0.5 mr-1.5 h-4 w-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Deploy Server
+              </a>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <% for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) { %>
+            <div class="bg-zinc-900/70 border border-zinc-800/50 rounded-xl overflow-hidden transition-all duration-200">
+              <!-- Top section with icon -->
+              <div class="relative bg-zinc-800/30 p-6 border-b border-zinc-800/50">
+                <div class="flex items-start justify-between">
+                  <div class="flex items-start">
+                    <div class="bg-zinc-900/90 rounded-xl p-3 border border-zinc-800/50 mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                        <path d="m3.3 7 8.7 5 8.7-5"/>
+                        <path d="M12 22V12"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 class="text-lg font-semibold text-zinc-200 tracking-tight">
+                        <%= pterodactyl.relationships.servers.data[i].attributes.name.length > 40 ? pterodactyl.relationships.servers.data[i].attributes.name.slice(0, 40) + "..." : pterodactyl.relationships.servers.data[i].attributes.name %>
+                      </h2>
+                      <p class="text-sm text-zinc-400 mt-1">
+                        <%= pterodactyl.relationships.servers.data[i].attributes.identifier %>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex space-x-2">
+                    <a href="<%= settings.pterodactyl.domain %>server/<%= pterodactyl.relationships.servers.data[i].attributes.identifier %>" target="_blank" class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 transition-colors">
+                      Manage
+                    </a>
+                    <a href="../edit?id=<%= pterodactyl.relationships.servers.data[i].attributes.id %>" class="inline-flex items-center rounded-lg bg-zinc-800/50 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="-ml-0.5 mr-1.5 h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                      </svg>
+                      Settings
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-6">
+                <div class="mt-2 grid grid-cols-3 gap-4">
+                  <div class="bg-zinc-800/50 border border-zinc-700/30 rounded-lg p-4">
+                    <dt class="text-sm font-medium text-zinc-400">CPU</dt>
+                    <dd class="mt-1 text-xl font-light tracking-tight text-zinc-200">
+                      <%= pterodactyl.relationships.servers.data[i].attributes.limits.cpu/100 %>
+                    </dd>
+                  </div>
+                  <div class="bg-zinc-800/50 border border-zinc-700/30 rounded-lg p-4">
+                    <dt class="text-sm font-medium text-zinc-400">RAM</dt>
+                    <dd class="mt-1 text-xl font-light tracking-tight text-zinc-200">
+                      <%= pterodactyl.relationships.servers.data[i].attributes.limits.memory/1024 %> GiB
+                    </dd>
+                  </div>
+                  <div class="bg-zinc-800/50 border border-zinc-700/30 rounded-lg p-4">
+                    <dt class="text-sm font-medium text-zinc-400">Disk</dt>
+                    <dd class="mt-1 text-xl font-light tracking-tight text-zinc-200">
+                      <%= pterodactyl.relationships.servers.data[i].attributes.limits.disk/1024 %> GiB
+                    </dd>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            <% } %>
+            <% if (pterodactyl.relationships.servers.data.length == 1) { %>
+            <div class="bg-zinc-900/70 border border-zinc-800/50 rounded-xl overflow-hidden shadow-lg hover:shadow-zinc-900/40 transition-all duration-300 flex items-center justify-center p-6">
+              <a href="../servers/new" class="transition inline-flex items-center justify-center rounded-xl bg-zinc-800/70 p-4 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-600">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </a>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Adspace -->
+      <div class="flex justify-center w-full px-4 sm:px-6 md:px-8 py-4">
+        <div class="w-full max-w-7xl rounded-xl bg-zinc-900/70 border border-zinc-800/50 p-4 text-center">
+          <div class="text-sm text-zinc-400">Advertisement</div>
+          <!-- Ad content goes here -->
+        </div>
+      </div>
+    </main>
+    <%- include('../components/footer') %>
+  </div>
+
+  <script>
+  async function renewServer(serverId) {
+    try {
+      const response = await fetch(`/api/renew/${serverId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(data.error || 'Failed to renew server');
+      }
+    } catch (error) {
+      console.error('Error renewing server:', error);
+      alert('Failed to renew server');
+    }
+  }
+
+  async function resetRenewal(serverId) {
+    try {
+      const response = await fetch(`/api/renewal/reset/${serverId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reset renewal');
+      }
+
+      // Reload the page to show updated status
+      window.location.reload();
+    } catch (error) {
+      console.error('Error resetting renewal:', error);
+      alert('Failed to reset renewal. Please try again.');
+    }
+  }
+  </script>
+</body>

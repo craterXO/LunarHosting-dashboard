@@ -1,16 +1,13 @@
+/**
+ * |-| [- |_ | /\ ( ~|~ `/ |_
+ *
+ * Heliactyl 14.11.0 ― Cascade Ridge
+ *
+ * This is for the admin side of Heliactyl.
+ * @module admin
+ */
 
-const loadConfig = require("../handlers/config");
-const settings = loadConfig("./config.toml");
-const TOML = require('@iarna/toml')
-const fetch = require("node-fetch");
-const fs = require("fs");
-const indexjs = require("../app.js");
-const adminjs = require("./admin.js");
-const ejs = require("ejs");
-const log = require("../handlers/log.js");
-
-/* Ensure platform release target is met */
-const plexactylModule = { "name": "Admin", "target_platform": "18.0.x" };
+const settings = require("../settings.json");
 
 if (settings.pterodactyl)
   if (settings.pterodactyl.domain) {
@@ -18,10 +15,51 @@ if (settings.pterodactyl)
       settings.pterodactyl.domain = settings.pterodactyl.domain.slice(0, -1);
   }
 
-/* Module */
-module.exports.plexactylModule = plexactylModule;
+const fetch = require("node-fetch");
+const fs = require("fs");
+const indexjs = require("../app.js");
+const adminjs = require("./admin.js");
+const ejs = require("ejs");
+const log = require("../misc/log");
+
 module.exports.load = async function (app, db) {
-  app.get("/cp/setcoins", async (req, res) => {
+  app.get("/settings/update", async (req, res) => {
+    // Check if the user is authorized to make changes
+    if (!req.session.pterodactyl || !req.session.pterodactyl.root_admin) {
+      return res.status(403).send("Unauthorized");
+    }
+
+    const setting = req.query.setting;
+    const value = req.query.value;
+
+    if (!setting || !value) {
+      return res.status(400).send("Missing setting or value parameter");
+    }
+
+    try {
+      const settingsPath = "./settings.json";
+      const settings = JSON.parse(fs.readFileSync(settingsPath));
+
+      // Split the setting path by dots and set the value
+      const keys = setting.split(".");
+      let currentObj = settings;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!currentObj[keys[i]]) {
+          currentObj[keys[i]] = {};
+        }
+        currentObj = currentObj[keys[i]];
+      }
+      currentObj[keys[keys.length - 1]] = value;
+
+      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+      res.send("Settings updated successfully");
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+  
+  app.get("/setcoins", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -63,6 +101,9 @@ module.exports.load = async function (app, db) {
     if (isNaN(coins))
       return res.redirect(failredirect + "?err=INVALIDCOINNUMBER");
 
+    if (coins < 0 || coins > 999999999999999)
+      return res.redirect(`${failredirect}?err=COINSIZE`);
+
     if (coins == 0) {
       await db.delete("coins-" + id);
     } else {
@@ -72,12 +113,12 @@ module.exports.load = async function (app, db) {
     let successredirect = theme.settings.redirect.setcoins || "/";
     log(
       `set coins`,
-      `${req.session.userinfo.username} set the coins of the user with the ID \`${id}\` to \`${coins}\`.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} set the coins of the user with the ID \`${id}\` to \`${coins}\`.`
     );
     res.redirect(successredirect + "?err=none");
   });
 
-  app.get("/cp/addcoins", async (req, res) => {
+  app.get("/addcoins", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -121,6 +162,9 @@ module.exports.load = async function (app, db) {
     if (isNaN(coins))
       return res.redirect(failredirect + "?err=INVALIDCOINNUMBER");
 
+    if (coins < 0 || coins > 999999999999999)
+      return res.redirect(`${failredirect}?err=COINSIZE`);
+
     if (coins == 0) {
       await db.delete("coins-" + id);
     } else {
@@ -130,12 +174,12 @@ module.exports.load = async function (app, db) {
     let successredirect = theme.settings.redirect.setcoins || "/";
     log(
       `add coins`,
-      `${req.session.userinfo.username} added \`${req.query.coins}\` coins to the user with the ID \`${id}\`'s account.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} added \`${req.query.coins}\` coins to the user with the ID \`${id}\`'s account.`
     );
     res.redirect(successredirect + "?err=none");
   });
 
-  app.get("/cp/setresources", async (req, res) => {
+  app.get("/setresources", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -193,21 +237,33 @@ module.exports.load = async function (app, db) {
 
       if (ramstring) {
         let ram = parseFloat(ramstring);
+        if (ram < 0 || ram > 999999999999999) {
+          return res.redirect(`${failredirect}?err=RAMSIZE`);
+        }
         extra.ram = ram;
       }
 
       if (diskstring) {
         let disk = parseFloat(diskstring);
+        if (disk < 0 || disk > 999999999999999) {
+          return res.redirect(`${failredirect}?err=DISKSIZE`);
+        }
         extra.disk = disk;
       }
 
       if (cpustring) {
         let cpu = parseFloat(cpustring);
+        if (cpu < 0 || cpu > 999999999999999) {
+          return res.redirect(`${failredirect}?err=CPUSIZE`);
+        }
         extra.cpu = cpu;
       }
 
       if (serversstring) {
         let servers = parseFloat(serversstring);
+        if (servers < 0 || servers > 999999999999999) {
+          return res.redirect(`${failredirect}?err=SERVERSIZE`);
+        }
         extra.servers = servers;
       }
 
@@ -226,7 +282,7 @@ module.exports.load = async function (app, db) {
 
       log(
         `set resources`,
-        `${req.session.userinfo.username} set the resources of the user with the ID \`${id}\` to:\`\`\`servers: ${serversstring}\nCPU: ${cpustring}%\nMemory: ${ramstring} MB\nDisk: ${diskstring} MB\`\`\``
+        `${req.session.userinfo.username}#${req.session.userinfo.discriminator} set the resources of the user with the ID \`${id}\` to:\`\`\`servers: ${serversstring}\nCPU: ${cpustring}%\nMemory: ${ramstring} MB\nDisk: ${diskstring} MB\`\`\``
       );
       return res.redirect(successredirect + "?err=none");
     } else {
@@ -234,7 +290,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/cp/addresources", async (req, res) => {
+  app.get("/addresources", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -295,21 +351,33 @@ module.exports.load = async function (app, db) {
 
       if (ramstring) {
         let ram = parseFloat(ramstring);
+        if (ram < 0 || ram > 999999999999999) {
+          return res.redirect(`${failredirect}?err=RAMSIZE`);
+        }
         extra.ram = extra.ram + ram;
       }
 
       if (diskstring) {
         let disk = parseFloat(diskstring);
+        if (disk < 0 || disk > 999999999999999) {
+          return res.redirect(`${failredirect}?err=DISKSIZE`);
+        }
         extra.disk = extra.disk + disk;
       }
 
       if (cpustring) {
         let cpu = parseFloat(cpustring);
+        if (cpu < 0 || cpu > 999999999999999) {
+          return res.redirect(`${failredirect}?err=CPUSIZE`);
+        }
         extra.cpu = extra.cpu + cpu;
       }
 
       if (serversstring) {
         let servers = parseFloat(serversstring);
+        if (servers < 0 || servers > 999999999999999) {
+          return res.redirect(`${failredirect}?err=SERVERSIZE`);
+        }
         extra.servers = extra.servers + servers;
       }
 
@@ -331,7 +399,7 @@ module.exports.load = async function (app, db) {
     }
   });
 
-  app.get("/cp/setplan", async (req, res) => {
+  app.get("/setplan", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -372,24 +440,27 @@ module.exports.load = async function (app, db) {
 
       log(
         `set plan`,
-        `${req.session.userinfo.username} removed the plan of the user with the ID \`${req.query.id}\`.`
+        `${req.session.userinfo.username}#${req.session.userinfo.discriminator} removed the plan of the user with the ID \`${req.query.id}\`.`
       );
       return res.redirect(successredirect + "?err=none");
     } else {
-      if (!settings.api.client.packages.list[req.query.package])
+      let newsettings = JSON.parse(
+        fs.readFileSync("./settings.json").toString()
+      );
+      if (!newsettings.api.client.packages.list[req.query.package])
         return res.redirect(`${failredirect}?err=INVALIDPACKAGE`);
       await db.set("package-" + req.query.id, req.query.package);
       adminjs.suspend(req.query.id);
 
       log(
         `set plan`,
-        `${req.session.userinfo.username} set the plan of the user with the ID \`${req.query.id}\` to \`${req.query.package}\`.`
+        `${req.session.userinfo.username}#${req.session.userinfo.discriminator} set the plan of the user with the ID \`${req.query.id}\` to \`${req.query.package}\`.`
       );
       return res.redirect(successredirect + "?err=none");
     }
   });
 
-  app.get("/cp/create_coupon", async (req, res) => {
+  app.get("/create_coupon", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -478,14 +549,14 @@ module.exports.load = async function (app, db) {
 
     log(
       `create coupon`,
-      `${req.session.userinfo.username} created the coupon code \`${code}\` which gives:\`\`\`coins: ${coins}\nMemory: ${ram} MB\nDisk: ${disk} MB\nCPU: ${cpu}%\nServers: ${servers}\`\`\``
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} created the coupon code \`${code}\` which gives:\`\`\`coins: ${coins}\nMemory: ${ram} MB\nDisk: ${disk} MB\nCPU: ${cpu}%\nServers: ${servers}\`\`\``
     );
     res.redirect(
       theme.settings.redirect.couponcreationsuccess + "?code=" + code
     );
   });
 
-  app.get("/cp/revoke_coupon", async (req, res) => {
+  app.get("/revoke_coupon", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -529,14 +600,14 @@ module.exports.load = async function (app, db) {
 
     log(
       `revoke coupon`,
-      `${req.session.userinfo.username} revoked the coupon code \`${code}\`.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} revoked the coupon code \`${code}\`.`
     );
     res.redirect(
       theme.settings.redirect.couponrevokesuccess + "?revokedcode=true"
     );
   });
 
-  app.get("/cp/remove_account", async (req, res) => {
+  app.get("/remove_account", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -611,14 +682,14 @@ module.exports.load = async function (app, db) {
 
     log(
       `remove account`,
-      `${req.session.userinfo.username} removed the account with the ID \`${discordid}\`.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} removed the account with the ID \`${discordid}\`.`
     );
     res.redirect(
       theme.settings.redirect.removeaccountsuccess + "?success=REMOVEACCOUNT"
     );
   });
 
-  app.get("/cp/getip", async (req, res) => {
+  app.get("/getip", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -656,12 +727,12 @@ module.exports.load = async function (app, db) {
     let ip = await db.get("ip-" + req.query.id);
     log(
       `view ip`,
-      `${req.session.userinfo.username} viewed the IP of the account with the ID \`${req.query.id}\`.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} viewed the IP of the account with the ID \`${req.query.id}\`.`
     );
     return res.redirect(successredirect + "?err=NONE&ip=" + ip);
   });
 
-  app.get("/cp/userinfo", async (req, res) => {
+  app.get("/userinfo", async (req, res) => {
     let theme = indexjs.get(req);
 
     if (!req.session.pterodactyl) return four0four(req, res, theme);
@@ -692,24 +763,26 @@ module.exports.load = async function (app, db) {
     if (!(await db.get("users-" + req.query.id)))
       return res.send({ status: "invalid id" });
 
-    if (settings.api.client.oauth2.link.slice(-1) == "/")
-      settings.api.client.oauth2.link =
-        settings.api.client.oauth2.link.slice(0, -1);
+    let newsettings = JSON.parse(fs.readFileSync("./settings.json").toString());
 
-    if (settings.api.client.oauth2.callbackpath.slice(0, 1) !== "/")
-      settings.api.client.oauth2.callbackpath =
-        "/" + settings.api.client.oauth2.callbackpath;
+    if (newsettings.api.client.oauth2.link.slice(-1) == "/")
+      newsettings.api.client.oauth2.link =
+        newsettings.api.client.oauth2.link.slice(0, -1);
 
-    if (settings.pterodactyl.domain.slice(-1) == "/")
-      settings.pterodactyl.domain = settings.pterodactyl.domain.slice(
+    if (newsettings.api.client.oauth2.callbackpath.slice(0, 1) !== "/")
+      newsettings.api.client.oauth2.callbackpath =
+        "/" + newsettings.api.client.oauth2.callbackpath;
+
+    if (newsettings.pterodactyl.domain.slice(-1) == "/")
+      newsettings.pterodactyl.domain = newsettings.pterodactyl.domain.slice(
         0,
         -1
       );
 
     let packagename = await db.get("package-" + req.query.id);
     let package =
-      settings.api.client.packages.list[
-        packagename ? packagename : settings.api.client.packages.default
+      newsettings.api.client.packages.list[
+        packagename ? packagename : newsettings.api.client.packages.default
       ];
     if (!package)
       package = {
@@ -723,7 +796,7 @@ module.exports.load = async function (app, db) {
 
     let pterodactylid = await db.get("users-" + req.query.id);
     let userinforeq = await fetch(
-      settings.pterodactyl.domain +
+      newsettings.pterodactyl.domain +
         "/api/application/users/" +
         pterodactylid +
         "?include=servers",
@@ -731,7 +804,7 @@ module.exports.load = async function (app, db) {
         method: "get",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${settings.pterodactyl.key}`,
+          Authorization: `Bearer ${newsettings.pterodactyl.key}`,
         },
       }
     );
@@ -758,12 +831,78 @@ module.exports.load = async function (app, db) {
           },
       userinfo: userinfo,
       coins:
-        settings.api.client.coins.enabled == true
+        newsettings.api.client.coins.enabled == true
           ? (await db.get("coins-" + req.query.id))
             ? await db.get("coins-" + req.query.id)
             : 0
           : null,
     });
+  });
+
+  app.get("/api/admin/stats", async (req, res) => {
+    if (!req.session.pterodactyl) return res.status(403).json({ error: "Unauthorized" });
+    
+    try {
+      // Fetch all users
+      let userCount = 0;
+      let totalServers = 0;
+      let locationCount = 0;
+      
+      // Get users from panel
+      const usersReq = await fetch(
+        `${settings.pterodactyl.domain}/api/application/users?include=servers`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${settings.pterodactyl.key}`,
+          },
+        }
+      );
+      
+      const users = await usersReq.json();
+      userCount = users.meta.pagination.total;
+      
+      // Get locations count
+      const locationsReq = await fetch(
+        `${settings.pterodactyl.domain}/api/application/locations`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${settings.pterodactyl.key}`,
+          },
+        }
+      );
+      
+      const locations = await locationsReq.json();
+      locationCount = locations.data.length;
+      
+      // Get servers count
+      const serversReq = await fetch(
+        `${settings.pterodactyl.domain}/api/application/servers`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${settings.pterodactyl.key}`,
+          },
+        }
+      );
+      
+      const servers = await serversReq.json();
+      totalServers = servers.meta.pagination.total;
+      
+      res.json({
+        users: userCount,
+        locations: locationCount,
+        servers: totalServers
+      });
+      
+    } catch (error) {
+      console.error("Error fetching admin stats:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   });
 
   async function four0four(req, res, theme) {
@@ -787,7 +926,8 @@ module.exports.load = async function (app, db) {
   }
 
   module.exports.suspend = async function (discordid) {
-    if (settings.api.client.allow.overresourcessuspend !== true) return;
+    let newsettings = JSON.parse(fs.readFileSync("./settings.json").toString());
+    if (newsettings.api.client.allow.overresourcessuspend !== true) return;
 
     let canpass = await indexjs.islimited();
     if (canpass == false) {
@@ -824,8 +964,8 @@ module.exports.load = async function (app, db) {
 
     let packagename = await db.get("package-" + discordid);
     let package =
-      settings.api.client.packages.list[
-        packagename || settings.api.client.packages.default
+      newsettings.api.client.packages.list[
+        packagename || newsettings.api.client.packages.default
       ];
 
     let extra = (await db.get("extra-" + discordid)) || {
@@ -885,6 +1025,29 @@ module.exports.load = async function (app, db) {
             "/api/application/servers/" +
             suspendid +
             "/suspend",
+          {
+            method: "post",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${settings.pterodactyl.key}`,
+            },
+          }
+        );
+      }
+    } else {
+      if (settings.api.client.allow.renewsuspendsystem.enabled == true) return;
+      for (
+        let i = 0, len = userinfo.attributes.relationships.servers.data.length;
+        i < len;
+        i++
+      ) {
+        let suspendid =
+          userinfo.attributes.relationships.servers.data[i].attributes.id;
+        await fetch(
+          settings.pterodactyl.domain +
+            "/api/application/servers/" +
+            suspendid +
+            "/unsuspend",
           {
             method: "post",
             headers: {

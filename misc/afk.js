@@ -22,10 +22,6 @@ connection.onopen = function(evt) {
 // Redirect to an err page if the ws connection is closed
 connection.onclose = function(evt) {
   console.log("Connection closed due to: " + evt.reason);
-  alert("The AFK websocket was disconnected. This can be due to one of these reasons: multiple AFK pages open, browser or network issues");
-  // Reset earned coins and timer on disconnect
-  document.getElementById("arciogainedcoins").innerHTML = "-";
-  document.getElementById("arciotimer").innerHTML = "-";
 };
 
 let timer = everywhat;

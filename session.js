@@ -1,7 +1,7 @@
 const Keyv = require('keyv');
 const { Store } = require('express-session');
 
-class SessionStore extends Store {
+class KeyvStore extends Store {
   constructor(options) {
     super();
     this.keyv = new Keyv(options.uri, options);
@@ -39,4 +39,4 @@ class SessionStore extends Store {
   }
 }
 
-module.exports = SessionStore;
+module.exports = KeyvStore;

@@ -1,4 +1,7 @@
 const fetch = require("node-fetch");
+const ejs = require("ejs");
+const { renderFile } = require("ejs");
+let newsettings = JSON.parse(require("fs").readFileSync("./settings.json"));
 
 module.exports = (key, db, ip, res) => {
   return new Promise(async (resolve) => {

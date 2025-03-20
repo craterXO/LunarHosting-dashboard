@@ -1,167 +1,244 @@
-<html class="h-full bg-bluey-800">
-<%- include('../components/head') %>
-<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
 
-<div>
-  <%- include('../components/navigation') %>
-  <main>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-<% if (req.query.success == "CREATED") { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">The server has successfully been created.</p>
-    </div>
-  </div>
-</div>
-<% } %>
-<% if (req.query.success == "MODIFIED") { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">The server has successfully been modified. The changes will appear on the Panel in a few seconds.</p>
-    </div>
-  </div>
-</div>
-<% } %>
-<div>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+</head>
 
-
-        <%
-            let ram = 0;
-            let disk = 0;
-            let cpu = 0;
-            let servers = pterodactyl.relationships.servers.data.length;
-            for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
-                ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
-                disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
-                cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
-            }
-        %>
-
-  <dl class="mt-5 grid grid-cols-1 rounded-lg bg-bluey-700 mb-8 overflow-hidden shadow divide-y divide-bluey-600 md:grid-cols-3 md:divide-y-0 md:divide-x">
-    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">RAM (GB)</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-        <div class="flex items-baseline text-2xl font-medium text-blue-300">
-          <%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 %>GB
-        </div>
-      </dd>
-    </div>
-
-    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">CPU Threads (%)</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-        <div class="flex items-baseline text-2xl font-medium text-blue-300">
-          <%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu %>%
-        </div>
-      </dd>
-    </div>
-
-    <div class="px-4 py-5 sm:p-6">
-      <dt class="text-base font-normal text-bluey-400">Disk (GB)</dt>
-      <dd class="mt-1 flex justify-between items-baseline md:block lg:flex">
-        <div class="flex items-baseline text-2xl font-medium text-blue-300">
-          <%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 %>GB
-        </div>
-      </dd>
-    </div>
-  </dl>
-</div>
-      <div class="transition ease-in-out delay-100 overflow-hidden bg-bluey-700 shadow sm:rounded-tr-lg sm:rounded-tl-lg border-transparent border-dashed border-2">
-        <br>
-      </div>
-      <% if (pterodactyl.relationships.servers.data.length == 0 && (!queued || !queued[0])) { %>
-        <p class="text-white w-full text-sm bg-bluey-700 pl-8">You don't have any active servers yet. <a href="/cp/servers/new" class="text-blue-200 hover:text-blue-300 transition">Would you like to create one?</a></p>
-      <% } %>
-      <% for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) { %>
-      <div onclick="location.href='/cp/servers/edit?id=<%= pterodactyl.relationships.servers.data[i].attributes.id %>'" class="transition ease-in-out delay-100 overflow-hidden bg-bluey-700 shadow cursor-pointer border-transparent border-dashed border-2 hover:border-bluey-600">
-        <div class="px-4 py-5 sm:px-6">
-          <h3 class="text-lg font-medium leading-6 text-white"><%= pterodactyl.relationships.servers.data[i].attributes.name.length > 15 ? pterodactyl.relationships.servers.data[i].attributes.name.slice(0, 12) + "..." : pterodactyl.relationships.servers.data[i].attributes.name %></h3>
-          <p class="mt-1 mb-4 max-w-2xl text-sm text-bluey-300">
-          <% if (!pterodactyl.relationships.servers.data[i].attributes.description) { %>
-            No description has been set.
-          <% } else { %>
-            <%= pterodactyl.relationships.servers.data[i].attributes.description %>
-          <% } %>
-          </p>
-          <span class="bg-bluey-600 text-bluey-100 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"><%= pterodactyl.relationships.servers.data[i].attributes.limits.memory/1024 %>GB RAM</span> <span class="bg-bluey-600 text-bluey-100 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"><%= pterodactyl.relationships.servers.data[i].attributes.limits.cpu %>% CPU</span> <span class="bg-bluey-600 text-bluey-100 text-xs font-medium mr-2 px-2.5 py-0.5 rounded"><%= pterodactyl.relationships.servers.data[i].attributes.limits.disk/1024 %>GB Disk</span>
-        </div>
-      </div>
-      <% } %>
-                  <%
-                  function getRelativeTime(isoTimestamp) {
-                     const now = new Date();
-                     const timestamp = new Date(isoTimestamp);
-                     const diff = timestamp - now;
-                     
-                     // If the time is in the past
-                     if (diff < 0) {
-                       return 'Unknown';
-                     }
-                   
-                     const seconds = Math.floor(diff / 1000);
-                     const minutes = Math.floor(seconds / 60);
-                     const hours = Math.floor(minutes / 60);
-                     const days = Math.floor(hours / 24);
-                   
-                     if (days > 0) {
-                       return `in ${days} day${days !== 1 ? 's' : ''}`;
-                     } else if (hours > 0) {
-                       return `in ${hours} hour${hours !== 1 ? 's' : ''}`;
-                     } else if (minutes > 0) {
-                       return `in ${minutes} minute${minutes !== 1 ? 's' : ''}`;
-                     } else {
-                       return `in ${seconds} second${seconds !== 1 ? 's' : ''}`;
-                     }
-                   }
-                   
-                   function getEstimatedTime(position) {
-                     const totalMinutes = position * 1.85;
-                     const hours = Math.floor(totalMinutes / 60);
-                     const minutes = Math.floor(totalMinutes % 60);
-                     const seconds = Math.round((totalMinutes % 1) * 60);
-                     
-                     let result = '';
-                     if (hours > 0) {
-                       result += `${hours} hour${hours !== 1 ? 's' : ''}, `;
-                     }
-                     if (minutes > 0) {
-                       result += `${minutes} minute${minutes !== 1 ? 's' : ''}, `;
-                     }
-                     result += `${seconds} second${seconds !== 1 ? 's' : ''}`;
-                     
-                     return result.trim();
-                   }
-                  %>
-      <% if (queued) { %>
-        <% queued.forEach(function (queued) { %>
-          <div class="transition ease-in-out delay-100 overflow-hidden bg-bluey-700 shadow border-transparent">
-            <div class="px-4 py-5 sm:px-6">
-              <h3 class="text-lg font-medium leading-6 text-white"><%= queued.name %> <span class="text-bluey-400 ml-2 text-xs rounded bg-white/5 px-4 py-2">Awaiting deployment... <a class="text-red-300 hover:text-red-400 transition" href="/cp/queue-remove/<%= queued.queuePosition %>">Cancel</a></span></h3>
-              <p class="mt-4 max-w-2xl text-sm text-yellow-400">
-                No Available Capacity, In Queue (pos. <%= queued.queuePosition %>) ― ETA: <%= getEstimatedTime(queued.queuePosition) %> ― Next attempt: <%= getRelativeTime(queued.queueNextAttempt) %>
-              </p>
+<body class="bg-zinc-950 text-zinc-100 overflow-hidden" style="font-family: 'Inter', sans-serif;">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('../components/navigation') %>
+    <div class="flex flex-col flex-1 md:pl-64 overflow-hidden">
+      <main class="flex-1 overflow-y-auto overflow-x-hidden">
+        <div class="py-4 sm:py-6 overflow-hidden">
+          <% /* Skeleton loader, lasts about 0.3s to let the page content load */ %>
+          <%- include('../components/skeleton') %>
+          <div class="hidden max-w-7xl mx-auto px-3 sm:px-6 md:px-8 w-full overflow-hidden" id="content">
+            
+            <%
+               let ram = 0;
+               let disk = 0;
+               let cpu = 0;
+               let servers = pterodactyl.relationships.servers.data.length;
+               for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
+                  ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
+                  disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
+                  cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
+               }
+            %>
+            
+            <!-- Error Alert -->
+            <% if (req.query.err && req.query.err == "AFKERR") { %>
+            <div class="rounded-xl bg-red-900/20 border border-red-800/50 p-4 sm:p-6 mb-5">
+              <div class="flex flex-col sm:flex-row">
+                <div class="flex-shrink-0 mb-2 sm:mb-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 text-red-400">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="sm:ml-3">
+                  <h3 class="text-md font-medium tracking-tight text-red-200">An error was encountered</h3>
+                  <div class="mt-1 text-sm text-red-300/70">
+                    <p>Unfortunately, your WebSocket connection to the AFK page has disconnected - possibly by your browser or device. Please try again.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            
+            <!-- Welcome Card (Redesigned) with added top padding -->
+            <div class="pt-2 sm:pt-6 md:pt-8">
+              <div class="relative rounded-xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border border-zinc-700/30 shadow-lg mb-6 overflow-hidden">
+                <div class="px-4 sm:px-8 py-6 sm:py-8">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                      <p class="text-lg sm:text-xl font-semibold tracking-tight text-zinc-100">Good evening, <span class="text-indigo-400"><%= req.session.userinfo.global_name %></span> 👋</p>
+                      
+                      <p class="text-sm text-zinc-400 mt-2">Welcome to your dashboard. Here's a summary of your account.</p>
+                      
+                      <div class="flex flex-wrap gap-2 sm:gap-3 mt-4">
+                        <div class="inline-flex items-center bg-zinc-800/60 rounded-lg px-3 py-1.5 text-sm border border-zinc-700/50">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5 mr-1.5 text-amber-400">
+                            <path d="M8 7c3.314 0 6-1.343 6-3s-2.686-3-6-3-6 1.343-6 3 2.686 3 6 3Z" />
+                            <path d="M8 8.5c1.84 0 3.579-.37 4.914-1.037A6.33 6.33 0 0 0 14 6.78V8c0 1.657-2.686 3-6 3S2 9.657 2 8V6.78c.346.273.72.5 1.087.683C4.42 8.131 6.16 8.5 8 8.5Z" />
+                            <path d="M8 12.5c1.84 0 3.579-.37 4.914-1.037.366-.183.74-.41 1.086-.684V12c0 1.657-2.686 3-6 3s-6-1.343-6-3v-1.22c.346.273.72.5 1.087.683C4.42 12.131 6.16 12.5 8 12.5Z" />
+                          </svg>
+                          <span class="text-amber-400 font-medium"><%= coins.toFixed(2) %> coins</span>
+                        </div>
+                        
+                        <div class="inline-flex items-center bg-zinc-800/60 rounded-lg px-3 py-1.5 text-sm border border-zinc-700/50">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 text-indigo-400">
+                            <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+                          </svg>
+                          <span class="text-indigo-400 font-medium"><%= servers %> active servers</span>
+                        </div>
+                        
+                        <div class="inline-flex items-center mt-2 sm:mt-0 sm:ml-auto md:ml-0">
+                          <%- include('../components/buttons/primary.ejs', {
+                                  href: '../panel',
+                                  text: 'Panel'
+                                }) %>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="absolute right-0 top-0 bottom-0 flex items-center opacity-10 mr-4 md:mr-8">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                        <path d="M2 12h20"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Resource Stats -->
+            <div>
+              <h3 class="text-lg font-medium text-zinc-300 mb-3 px-1">Available Resources</h3>
+              <dl class="grid grid-cols-1 gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- CPU -->
+                <div class="relative py-4 sm:py-6 px-4 sm:px-6 bg-zinc-900/70 rounded-xl overflow-hidden border border-zinc-800/50 shadow-lg transition hover:bg-zinc-900/90 group">
+                  <dt class="text-sm font-medium text-zinc-400 mb-2">CPU Cores</dt>
+                  <dd class="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100"><%= packages.cpu/100 + extraresources.cpu/100 - cpu/100 %></dd>
+                  <div class="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500 -mr-8">
+                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      <path d="m3.3 7 8.7 5 8.7-5"/>
+                      <path d="M12 22V12"/>
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Memory -->
+                <div class="relative py-4 sm:py-6 px-4 sm:px-6 bg-zinc-900/70 rounded-xl overflow-hidden border border-zinc-800/50 shadow-lg transition hover:bg-zinc-900/90 group">
+                  <dt class="text-sm font-medium text-zinc-400 mb-2">Memory</dt>
+                  <dd class="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100"><%= packages.ram/1024 + extraresources.ram/1024 - ram/1024 %> GiB</dd>
+                  <div class="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-500 -mr-8">
+                      <path d="M6 19v-3"/>
+                      <path d="M10 19v-3"/>
+                      <path d="M14 19v-3"/>
+                      <path d="M18 19v-3"/>
+                      <path d="M8 11V9"/>
+                      <path d="M16 11V9"/>
+                      <path d="M12 11V9"/>
+                      <path d="M2 15h20"/>
+                      <path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.1a2 2 0 0 0 0-3.837Z"/>
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Storage -->
+                <div class="relative py-4 sm:py-6 px-4 sm:px-6 bg-zinc-900/70 rounded-xl overflow-hidden border border-zinc-800/50 shadow-lg transition hover:bg-zinc-900/90 group">
+                  <dt class="text-sm font-medium text-zinc-400 mb-2">Storage</dt>
+                  <dd class="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100"><%= packages.disk/1024 + extraresources.disk/1024 - disk/1024 %> GiB</dd>
+                  <div class="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-indigo-500 -mr-8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+                    </svg>
+                  </div>
+                </div>
+                
+                <!-- Servers -->
+                <div class="relative py-4 sm:py-6 px-4 sm:px-6 bg-zinc-900/70 rounded-xl overflow-hidden border border-zinc-800/50 shadow-lg transition hover:bg-zinc-900/90 group">
+                  <dt class="text-sm font-medium text-zinc-400 mb-2">Servers</dt>
+                  <dd class="mt-1 text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100"><%= packages.servers + extraresources.servers - servers %></dd>
+                  <div class="absolute right-0 top-1/2 transform -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-24 h-24 text-indigo-500 -mr-8">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z" />
+                    </svg>
+                  </div>
+                </div>
+              </dl>
+            </div>
+            
+            <!-- Quick Action Cards (Redesigned - Dark Theme with Accents) -->
+            <div class="mt-6">
+              <h3 class="text-lg font-medium text-zinc-300 mb-3 px-1">Quick Actions</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                
+                <!-- Create Server Card -->
+                <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50 hover:-translate-y-1 hover:border-indigo-900/50 hover:shadow-indigo-900/10">
+                  <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="absolute left-0 top-0 h-full w-1 bg-indigo-500/50"></div>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-indigo-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                  </div>
+                  <a href="../create" class="relative block p-4 sm:p-6">
+                    <h3 class="text-md font-semibold text-zinc-200 mb-1 group-hover:text-indigo-200 transition-colors">Create Server</h3>
+                    <p class="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors">Deploy a new server instantly.</p>
+                  </a>
+                </div>
+                
+                <!-- AFK Rewards Card -->
+                <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50 hover:-translate-y-1 hover:border-amber-900/50 hover:shadow-amber-900/10">
+                  <div class="absolute inset-0 bg-gradient-to-br from-amber-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="absolute left-0 top-0 h-full w-1 bg-amber-500/50"></div>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-amber-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                  </div>
+                  <a href="../afk" class="relative block p-4 sm:p-6">
+                    <h3 class="text-md font-semibold text-zinc-200 mb-1 group-hover:text-amber-200 transition-colors">AFK Rewards</h3>
+                    <p class="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors">Earn coins while AFK.</p>
+                  </a>
+                </div>
+                
+                <!-- Gift Card -->
+                <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50 hover:-translate-y-1 hover:border-emerald-900/50 hover:shadow-emerald-900/10">
+                  <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="absolute left-0 top-0 h-full w-1 bg-emerald-500/50"></div>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-emerald-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                    </svg>
+                  </div>
+                  <a href="../gift" class="relative block p-4 sm:p-6">
+                    <h3 class="text-md font-semibold text-zinc-200 mb-1 group-hover:text-emerald-200 transition-colors">Gift Resources</h3>
+                    <p class="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors">Share with friends.</p>
+                  </a>
+                </div>
+                
+                <!-- Store Card -->
+                <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800/50 hover:-translate-y-1 hover:border-purple-900/50 hover:shadow-purple-900/10">
+                  <div class="absolute inset-0 bg-gradient-to-br from-purple-900/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div class="absolute left-0 top-0 h-full w-1 bg-purple-500/50"></div>
+                  <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-purple-400">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 3 9 9M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                    </svg>
+                  </div>
+                  <a href="../store" class="relative block p-4 sm:p-6">
+                    <h3 class="text-md font-semibold text-zinc-200 mb-1 group-hover:text-purple-200 transition-colors">Resource Store</h3>
+                    <p class="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors">Buy more resources.</p>
+                  </a>
+                </div>
+                
+              </div>
+            </div>
+            
+            <!-- Ad Banner Placeholder - Simple Rectangle -->
+            <div class="mt-6 sm:mt-8 mb-6 sm:mb-8">
+              <div class="w-full h-16 sm:h-24 bg-zinc-800/50 border border-zinc-700/30 rounded-lg flex items-center justify-center">
+                <p class="text-sm text-zinc-500">Ad Space</p>
+                <!-- Ad code will be placed here -->
+              </div>
             </div>
           </div>
-          <% }); %>
-      <% } %>
-      <div class="transition ease-in-out delay-100 overflow-hidden bg-bluey-700 shadow border-transparent border-dashed border-2 rounded-bl-lg rounded-br-lg">
-        <br>
-      </div>
-      <!-- /End replace -->
+        </div>
+      </main>
+      <%- include('../components/footer') %>
     </div>
-  </main>
-</div>
+  </div>
+</body>

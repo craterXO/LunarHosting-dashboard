@@ -1,0 +1,384 @@
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Existing version check script
+    fetch('https://atqr.pages.dev/heliactyl.json')
+      .then(response => response.json())
+      .then(data => {
+        const currentVersion = '<%= settings.version %>';
+        const latestVersion = data.latest;
+        const versionSpan = document.getElementById('currentVersion');
+        const versionStatusSpan = document.getElementById('versionStatus');
+        
+        versionSpan.textContent = currentVersion;
+        
+        if (currentVersion === latestVersion) {
+          versionStatusSpan.textContent = 'You are running the latest version. Good job!';
+          versionStatusSpan.classList.add('text-zinc-400', 'text-xs', 'pt-2');
+        } else {
+          const link = document.createElement('a');
+          link.href = 'https://github.com/heliactyloss/heliactyl/releases/tag/' + latestVersion;
+          link.classList.add('text-amber-400', 'transition', 'hover:text-amber-500', 'font-medium');
+          link.textContent = 'here';
+          
+          const linkText = document.createTextNode(`Heliactyl ${latestVersion} is ready to be updated to. Please click `);
+          versionStatusSpan.appendChild(linkText);
+          versionStatusSpan.appendChild(link);
+          versionStatusSpan.appendChild(document.createTextNode(' to download it'));
+          versionStatusSpan.classList.add('text-amber-400', 'text-xs', 'pt-2');
+        }
+        document.getElementById('content').classList.remove('hidden');
+      })
+      .catch(error => {
+        console.error('Error fetching latest version:', error);
+        document.getElementById('content').classList.remove('hidden');
+      });
+  </script>
+</head>
+
+<body class="bg-zinc-950 text-zinc-100" style="font-family: 'Inter', sans-serif;">
+  <div>
+    <%- include('../components/navigation') %>
+    <div class="md:pl-64 flex flex-col flex-1">
+      <main class="flex-1">
+        <div class="py-6">
+          <%- include('../components/skeleton') %>
+          <div class="hidden max-w-7xl mx-auto px-4 sm:px-6 md:px-8" id="content">
+            <!-- Header -->
+            <div class="pt-2 sm:pt-6 md:pt-8">
+              <div class="relative rounded-xl bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 border border-zinc-700/30 shadow-lg mb-6 overflow-hidden">
+                <div class="px-4 sm:px-8 py-6 sm:py-8">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="flex-1">
+                      <div class="flex items-center">
+                        <div class="bg-zinc-800/50 rounded-xl p-3 border border-zinc-800/50">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                          </svg>
+                        </div>
+                        <div class="ml-4">
+                          <h2 class="text-xl font-semibold text-zinc-200 tracking-tight">Admin Panel</h2>
+                          <p class="text-sm text-zinc-400">Manage your AstraDesk instance</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Error Alert -->
+            <% if (req.query.err) { %>
+            <div class="rounded-xl bg-zinc-900/70 border border-zinc-800/50 p-4 mb-6">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-zinc-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" />
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-md font-medium text-zinc-200">An error occurred</h3>
+                  <p class="mt-1 text-sm text-zinc-400">Error code: <code><%= req.query.err %></code></p>
+                </div>
+              </div>
+            </div>
+            <% } %>
+
+            <!-- Version Info Card -->
+            <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden mb-8">
+              <div class="p-6">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-lg font-medium text-zinc-200">AstraDesk Version</h3>
+                    <p class="mt-2 text-sm text-zinc-400">
+                      Running version <span class="bg-zinc-800/70 px-2 py-1 rounded-lg text-zinc-300" id="currentVersion"></span>
+                    </p>
+                    <span id="versionStatus" class="block mt-2"></span>
+                  </div>
+                  <div class="bg-zinc-800/50 rounded-xl p-4 border border-zinc-800/50">
+                    <img src="https://atqr.pages.dev/v2Favicon.png" class="h-12 w-12">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <!-- Total Users -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Total Users</h3>
+                  <p class="mt-2 text-3xl font-semibold text-zinc-100" id="totalUsers">-</p>
+                </div>
+              </div>
+
+              <!-- Total Servers -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                    <line x1="6" y1="6" x2="6.01" y2="6"/>
+                    <line x1="6" y1="18" x2="6.01" y2="18"/>
+                  </svg>
+                </div>
+                <div class="p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Total Servers</h3>
+                  <p class="mt-2 text-3xl font-semibold text-zinc-100" id="totalServers">-</p>
+                </div>
+              </div>
+
+              <!-- Locations -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                </div>
+                <div class="p-6">
+                  <h3 class="text-lg font-medium text-zinc-200">Locations</h3>
+                  <p class="mt-2 text-3xl font-semibold text-zinc-100" id="totalLocations">-</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Coins Card -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <!-- Add Coins -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <rect width="20" height="14" x="2" y="5" rx="2"/>
+                    <line x1="2" x2="22" y1="10" y2="10"/>
+                  </svg>
+                </div>
+                <div class="p-6">
+                  <div class="flex items-center mb-6">
+                    <div class="bg-zinc-800/50 rounded-xl p-3 border border-zinc-800/50">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                        <circle cx="12" cy="12" r="8"/>
+                        <path d="M14 8.5a2 2 0 0 0-4 0v7a2 2 0 0 0 4 0Z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-zinc-200 ml-3">Add Coins</h3>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-zinc-400 mb-2">Discord ID</label>
+                      <div class="relative">
+                        <input type="text" id="id1" placeholder="000000000000000000" 
+                               class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label class="block text-sm font-medium text-zinc-400 mb-2">Amount</label>
+                      <div class="relative">
+                        <input type="text" id="amount1" placeholder="100"
+                               class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                            <circle cx="12" cy="12" r="8"/>
+                            <path d="M14 8.5a2 2 0 0 0-4 0v7a2 2 0 0 0 4 0Z"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onclick="addCoins()" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Add Coins
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Add Resources Card -->
+              <div class="group relative rounded-xl bg-zinc-900/70 border border-zinc-800/50 shadow-lg overflow-hidden">
+                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
+                    <polyline points="7.5 19.79 7.5 14.6 3 12"/>
+                    <polyline points="21 12 16.5 14.6 16.5 19.79"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                    <line x1="12" y1="22.08" x2="12" y2="12"/>
+                  </svg>
+                </div>
+                <div class="p-6">
+                  <div class="flex items-center mb-6">
+                    <div class="bg-zinc-800/50 rounded-xl p-3 border border-zinc-800/50">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400">
+                        <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/>
+                        <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-zinc-200 ml-3">Add Resources</h3>
+                  </div>
+
+                  <div class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-zinc-400 mb-2">Discord ID</label>
+                      <div class="relative">
+                        <input type="text" id="id2" placeholder="000000000000000000"
+                               class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">CPU Cores</label>
+                        <div class="relative">
+                          <input type="text" id="cpu" placeholder="1"
+                                 class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                              <rect x="4" y="4" width="16" height="16" rx="2" ry="2"/>
+                              <rect x="9" y="9" width="6" height="6"/>
+                              <line x1="9" y1="1" x2="9" y2="4"/>
+                              <line x1="15" y1="1" x2="15" y2="4"/>
+                              <line x1="9" y1="20" x2="9" y2="23"/>
+                              <line x1="15" y1="20" x2="15" y2="23"/>
+                              <line x1="20" y1="9" x2="23" y2="9"/>
+                              <line x1="20" y1="14" x2="23" y2="14"/>
+                              <line x1="1" y1="9" x2="4" y2="9"/>
+                              <line x1="1" y1="14" x2="4" y2="14"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">Memory (GiB)</label>
+                        <div class="relative">
+                          <input type="text" id="memory" placeholder="2"
+                                 class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                              <path d="M6 19v-3"/>
+                              <path d="M10 19v-3"/>
+                              <path d="M14 19v-3"/>
+                              <path d="M18 19v-3"/>
+                              <path d="M8 11V9"/>
+                              <path d="M16 11V9"/>
+                              <path d="M12 11V9"/>
+                              <path d="M2 15h20"/>
+                              <path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.1a2 2 0 0 0 0-3.837Z"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">Storage (GiB)</label>
+                        <div class="relative">
+                          <input type="text" id="storage" placeholder="10"
+                                 class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                              <path d="M21 5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5Z"/>
+                              <path d="M9 21v-7.4a.6.6 0 0 1 .6-.6h4.8a.6.6 0 0 1 .6.6V21"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-zinc-400 mb-2">Servers</label>
+                        <div class="relative">
+                          <input type="text" id="servers" placeholder="5"
+                                 class="w-full bg-zinc-800/50 border border-zinc-700/30 rounded-lg pl-10 pr-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/50">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500">
+                              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                              <line x1="6" y1="6" x2="6.01" y2="6"/>
+                              <line x1="6" y1="18" x2="6.01" y2="18"/>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button onclick="addResources()" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-zinc-800/50 text-sm font-medium text-zinc-200 hover:bg-zinc-800 transition-colors group">
+                      Add Resources
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2 transform group-hover:translate-x-0.5 transition-transform">
+                        <path d="M5 12h14"/>
+                        <path d="m12 5 7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              async function addCoins() {
+                let id1 = encodeURIComponent(document.getElementById("id1").value);
+                let amount1 = encodeURIComponent(document.getElementById("amount1").value);
+                document.location.href = `/addcoins?id=${id1}&coins=${amount1}`;
+              };
+
+              async function addResources() {
+                let id2 = encodeURIComponent(document.getElementById("id2").value);
+                let cpu = encodeURIComponent(document.getElementById("cpu").value * 100);
+                let memory = encodeURIComponent(document.getElementById("memory").value * 1024);
+                let storage = encodeURIComponent(document.getElementById("storage").value * 1024);
+                let servers = encodeURIComponent(document.getElementById("servers").value);
+                document.location.href = `/addresources?id=${id2}&cpu=${cpu}&ram=${memory}&disk=${storage}&servers=${servers}`;
+              };
+            </script>
+          </div>
+        </div>
+      </main>
+      <%- include('../components/footer') %>
+    </div>
+  </div>
+
+  <!-- Add this script before the closing body tag -->
+  <script>
+    // Fetch admin stats
+    fetch('/api/admin/stats')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('totalUsers').textContent = data.users;
+        document.getElementById('totalServers').textContent = data.servers;
+        document.getElementById('totalLocations').textContent = data.locations;
+      })
+      .catch(error => {
+        console.error('Error fetching admin stats:', error);
+      });
+  </script>
+</body>

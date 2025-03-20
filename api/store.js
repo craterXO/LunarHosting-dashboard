@@ -1,22 +1,16 @@
-
 const indexjs = require("../app.js");
 const adminjs = require("./admin.js");
-const loadConfig = require("../handlers/config");
-const settings = loadConfig("./config.toml");
+const settings = require("../settings.json");
+const fs = require("fs");
 const ejs = require("ejs");
-const log = require("../handlers/log.js");
+const log = require("../misc/log");
 
-/* Ensure platform release target is met */
-const plexactylModule = { "name": "Resources Store", "target_platform": "18.0.x" };
-
-/* Module */
-module.exports.plexactylModule = plexactylModule;
 module.exports.load = async function (app, db) {
-  app.get("/cp/buy", async (req, res) => {
-    if (!req.session.pterodactyl) return res.redirect("/cp/login");
+  app.get("/buy", async (req, res) => {
+    if (!req.session.pterodactyl) return res.redirect("/login");
 
-    let settings = await enabledCheck(req, res);
-    if (!settings) return;
+    let newsettings = await enabledCheck(req, res);
+    if (!newsettings) return;
 
     const { type, amount } = req.query;
     if (!type || !amount) return res.send("Missing type or amount");
@@ -28,15 +22,19 @@ module.exports.load = async function (app, db) {
     if (isNaN(parsedAmount) || parsedAmount < 1 || parsedAmount > 10)
       return res.send("Amount must be a number between 1 and 10");
 
+    const theme = indexjs.get(req);
+    const failedCallbackPath =
+      theme.settings.redirect[`failedpurchase${type}`] || "/";
+
     const userCoins = (await db.get(`coins-${req.session.userinfo.id}`)) || 0;
     const resourceCap =
       (await db.get(`${type}-${req.session.userinfo.id}`)) || 0;
 
-    const { per, cost } = settings.api.client.coins.store[type];
+    const { per, cost } = newsettings.api.client.coins.store[type];
     const purchaseCost = cost * parsedAmount;
 
     if (userCoins < purchaseCost)
-      return res.redirect(`/cp/store?err=CANNOTAFFORD`);
+      return res.redirect(`${failedCallbackPath}?err=CANNOTAFFORD`);
 
     const newUserCoins = userCoins - purchaseCost;
     const newResourceCap = resourceCap + parsedAmount;
@@ -69,14 +67,21 @@ module.exports.load = async function (app, db) {
 
     log(
       `Resources Purchased`,
-      `${req.session.userinfo.username} bought ${extraResource} ${type} from the store for \`${purchaseCost}\` coins.`
+      `${req.session.userinfo.username}#${req.session.userinfo.discriminator} bought ${extraResource} ${type} from the store for \`${purchaseCost}\` coins.`
     );
 
-    res.redirect("/cp/store?err=none");
+    res.redirect(
+      (theme.settings.redirect[`purchase${type}`]
+        ? theme.settings.redirect[`purchase${type}`]
+        : "/") + "?err=none"
+    );
   });
 
   async function enabledCheck(req, res) {
-    if (settings.api.client.coins.store.enabled) return settings;
+    const newsettings = JSON.parse(
+      fs.readFileSync("./settings.json").toString()
+    );
+    if (newsettings.api.client.coins.store.enabled) return newsettings;
 
     const theme = indexjs.get(req);
     ejs.renderFile(

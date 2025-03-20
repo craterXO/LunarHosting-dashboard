@@ -1,108 +1,290 @@
-<html class="h-full bg-bluey-800">
-<%- include('../components/head') %>
-<body style="font-family: 'Whitney', sans-serif;" class="bg-bluey-800 h-full">
+<head>
+  <title><%= settings.name %></title>
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/@popperjs/core@2.10.1/dist/umd/popper.min.js"></script>
 
-<div>
-  <%- include('../components/navigation') %>
-  <main>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-<% if (req.session.password) { %>
-<div class="rounded-md bg-green-800 p-4 mb-8">
-  <div class="flex">
-    <div class="flex-shrink-0">
-      <!-- Heroicon name: solid/information-circle -->
-      <svg class="h-5 w-5 text-green-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <div class="ml-3 flex-1 md:flex md:justify-between">
-      <p class="text-sm text-green-400">Password updated to: <code><%= req.session.password %></code></p>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-zinc-950 text-zinc-100" style="font-family: 'Inter', sans-serif;">
+  <div class="flex h-screen overflow-hidden">
+    <%- include('../components/navigation') %>
+    <div class="flex flex-col flex-1 md:pl-64">
+      <main class="flex-1 overflow-y-auto">
+        <div class="py-6">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            
+            <!-- Page Header -->
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center">
+                <div class="flex items-center justify-center w-12 h-12">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-zinc-400">
+                    <path d="M18.75 12.75h1.5a.75.75 0 0 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM12 6a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 6ZM12 18a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 12 18ZM3.75 6.75h1.5a.75.75 0 1 0 0-1.5h-1.5a.75.75 0 0 0 0 1.5ZM5.25 18.75h-1.5a.75.75 0 0 1 0-1.5h1.5a.75.75 0 0 1 0 1.5ZM3 12a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 3 12ZM9 3.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM12.75 12a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0ZM9 15.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" />
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h2 class="text-xl font-semibold text-zinc-100 tracking-tight">Server Settings</h2>
+                  <p class="text-sm text-zinc-400">Server ID: <span class="bg-zinc-800/50 px-2 py-0.5 rounded-md font-mono text-zinc-300"><%= req.query.id %></span></p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3">
+                <!-- Reinstall Button -->
+                <button onclick="confirmReinstall()" 
+                        class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-2">
+                    <path fill-rule="evenodd" d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z" clip-rule="evenodd" />
+                  </svg>
+                  Reinstall
+                </button>
+
+                <!-- Delete Button -->
+                <a href="../delete?id=<%= req.query.id %>" 
+                   class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
+                    <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+                  </svg>
+                  Delete Server
+                </a>
+              </div>
+            </div>
+
+            <% if (req.query.id) { %>
+              <% if (pterodactyl.relationships.servers.data.filter(name => name.attributes.id == req.query.id).length == 1) {
+                let serverinfo = pterodactyl.relationships.servers.data.filter(name => name.attributes.id == req.query.id)[0];
+                let attemptegg = null;
+                let attemptname = null;
+                for (let [name, value] of Object.entries(settings.api.client.eggs)) {
+                  if (settings.api.client.eggs[name].info.egg == serverinfo.attributes.egg) {
+                    attemptegg = settings.api.client.eggs[name];
+                    attemptname = name;
+                  };
+                };
+                let egginfo = attemptegg ? attemptegg.display : "???";
+              %>
+              
+              <!-- Server Settings Form -->
+              <div class="bg-zinc-900/70 border border-zinc-800/50 rounded-xl p-6">
+                <div class="space-y-6">
+                  <!-- Server Name -->
+                  <div>
+                    <label for="name" class="flex items-center text-sm font-medium text-zinc-300 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-2 text-zinc-500">
+                        <path d="M11.644 1.59a.75.75 0 01.712 0l9.75 5.25a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.712 0l-9.75-5.25a.75.75 0 010-1.32l9.75-5.25z" />
+                        <path d="M3.265 10.602l7.668 4.129a2.25 2.25 0 002.134 0l7.668-4.13 1.37.739a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.71 0l-9.75-5.25a.75.75 0 010-1.32l1.37-.738z" />
+                        <path d="M3.265 13.602l7.668 4.129a2.25 2.25 0 002.134 0l7.668-4.13 1.37.739a.75.75 0 010 1.32l-9.75 5.25a.75.75 0 01-.71 0l-9.75-5.25a.75.75 0 010-1.32l1.37-.738z" />
+                      </svg>
+                      Server Name
+                    </label>
+                    <input type="text" id="name" 
+                           value="<%= serverinfo.attributes.name %>"
+                           class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2.5 text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition">
+                  </div>
+
+                  <!-- Server Type -->
+                  <div>
+                    <label for="egg" class="flex items-center text-sm font-medium text-zinc-300 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-2 text-zinc-500">
+                        <path fill-rule="evenodd" d="M12 6.75a5.25 5.25 0 016.775-5.025.75.75 0 01.313 1.248l-3.32 3.319c.063.475.276.934.641 1.299.365.365.824.578 1.3.64l3.318-3.319a.75.75 0 011.248.313 5.25 5.25 0 01-5.472 6.756c-1.018-.086-1.87.1-2.309.634L7.344 21.3A3.298 3.298 0 112.7 16.657l8.684-7.151c.533-.44.72-1.291.634-2.309A5.342 5.342 0 0112 6.75zM4.117 19.125a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75h-.008a.75.75 0 01-.75-.75v-.008z" clip-rule="evenodd" />
+                        <path d="M10.076 8.64l-2.201-2.2V4.874a.75.75 0 00-.364-.643l-3.75-2.25a.75.75 0 00-.916.113l-.75.75a.75.75 0 00-.113.916l2.25 3.75a.75.75 0 00.643.364h1.564l2.062 2.062 1.575-1.297z" />
+                      </svg>
+                      Server Type
+                    </label>
+                    <select id="egg" class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2.5 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition">
+                      <% for (let [name, value] of Object.entries(settings.api.client.eggs)) { %>
+                        <option value="<%= value.info.egg %>" 
+                                <%= serverinfo.attributes.egg == value.info.egg ? 'selected' : '' %>>
+                          <%= value.display %>
+                        </option>
+                      <% } %>
+                    </select>
+                    <p class="mt-2 text-sm text-amber-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 inline mr-1">
+                        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                      </svg>
+                      Changing server type will reinstall the server with the new image
+                    </p>
+                  </div>
+
+                  <!-- Resources Section -->
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Memory -->
+                    <div>
+                      <label for="ram" class="flex items-center text-sm font-medium text-zinc-300 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-zinc-500">
+                          <path d="M6 19v-3"/>
+                          <path d="M10 19v-3"/>
+                          <path d="M14 19v-3"/>
+                          <path d="M18 19v-3"/>
+                          <path d="M8 11V9"/>
+                          <path d="M16 11V9"/>
+                          <path d="M12 11V9"/>
+                          <path d="M2 15h20"/>
+                          <path d="M2 7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v1.1a2 2 0 0 0 0 3.837V17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5.1a2 2 0 0 0 0-3.837Z"/>
+                        </svg>
+                        Memory (GiB)
+                      </label>
+                      <input type="text" id="ram" 
+                             value="<%= serverinfo.attributes.limits.memory/1024 %>"
+                             class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2.5 text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition">
+                    </div>
+
+                    <!-- CPU -->
+                    <div>
+                      <label for="cpu" class="flex items-center text-sm font-medium text-zinc-300 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-zinc-500">
+                          <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"/>
+                          <path d="m7 16.5-4.74-2.85"/>
+                          <path d="m7 16.5 5-3"/>
+                          <path d="M7 16.5v5.17"/>
+                          <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"/>
+                          <path d="m17 16.5-5-3"/>
+                          <path d="m17 16.5 4.74-2.85"/>
+                          <path d="M17 16.5v5.17"/>
+                          <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"/>
+                          <path d="M12 8 7.26 5.15"/>
+                          <path d="m12 8 4.74-2.85"/>
+                          <path d="M12 13.5V8"/>
+                        </svg>
+                        CPU Cores
+                      </label>
+                      <input type="text" id="cpu" 
+                             value="<%= serverinfo.attributes.limits.cpu/100 %>"
+                             class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2.5 text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition">
+                    </div>
+
+                    <!-- Storage -->
+                    <div>
+                      <label for="disk" class="flex items-center text-sm font-medium text-zinc-300 mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-2 text-zinc-500">
+                          <path d="M12 2v8"/>
+                          <path d="m16 6-4 4-4-4"/>
+                          <rect width="20" height="8" x="2" y="14" rx="2"/>
+                          <path d="M6 18h.01"/>
+                          <path d="M10 18h.01"/>
+                        </svg>
+                        Storage (GiB)
+                      </label>
+                      <input type="text" id="disk" 
+                             value="<%= serverinfo.attributes.limits.disk/1024 %>"
+                             class="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-4 py-2.5 text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition">
+                    </div>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <div class="pt-6 border-t border-zinc-800/50">
+                    <button onclick="submitForm()" 
+                            class="inline-flex items-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-zinc-900">
+                      <span id="contentWrapper" class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 mr-2">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                        </svg>
+                        Apply Changes
+                      </span>
+                      <span id="loaderWrapper" style="display:none;" class="flex items-center">
+                        <svg class="animate-spin h-4 w-4 text-white mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Applying...
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <script>
+                async function submitForm() {
+                  const button = document.querySelector('button');
+                  const name = document.getElementById("name").value;
+                  const egg = document.getElementById("egg").value;
+                  const ram = document.getElementById("ram").value;
+                  const disk = document.getElementById("disk").value;
+                  const cpu = document.getElementById("cpu").value;
+
+                  if (!name || !egg || !ram || !disk || !cpu) {
+                    alert('Please ensure all fields are filled');
+                    return;
+                  }
+
+                  // Show warning if egg type is being changed
+                  const currentEgg = "<%= serverinfo.attributes.egg %>";
+                  if (egg !== currentEgg) {
+                    if (!confirm('Warning: Changing the server type will reinstall the server. All data will be lost. Are you sure you want to continue?')) {
+                      return;
+                    }
+                  }
+
+                  try {
+                    button.disabled = true;
+                    document.getElementById('contentWrapper').style.display = 'none';
+                    document.getElementById('loaderWrapper').style.display = 'flex';
+
+                    const ramMB = Math.floor(parseFloat(ram) * 1024);
+                    const diskMB = Math.floor(parseFloat(disk) * 1024);
+                    const cpuPct = Math.floor(parseFloat(cpu) * 100);
+
+                    window.location.href = `/modify?id=<%= req.query.id %>&name=${encodeURIComponent(name)}&egg=${encodeURIComponent(egg)}&ram=${ramMB}&disk=${diskMB}&cpu=${cpuPct}`;
+                  } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    
+                    button.disabled = false;
+                    document.getElementById('contentWrapper').style.display = 'flex';
+                    document.getElementById('loaderWrapper').style.display = 'none';
+                  }
+                }
+
+                async function confirmReinstall() {
+                  if (confirm('Warning: Reinstalling the server will erase all data. Are you sure you want to continue?')) {
+                    try {
+                      window.location.href = `/reinstall?id=<%= req.query.id %>`;
+                    } catch (error) {
+                      console.error('Error:', error);
+                      alert('An error occurred while reinstalling the server. Please try again.');
+                    }
+                  }
+                }
+              </script>
+              <% } else { %>
+                <div class="rounded-xl bg-amber-900/20 border border-amber-800/50 p-4">
+                  <div class="flex">
+                    <div class="flex-shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-amber-400">
+                        <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-amber-200">Server Not Found</h3>
+                      <p class="mt-2 text-sm text-amber-200/70">Could not find server with the provided ID.</p>
+                    </div>
+                  </div>
+                </div>
+              <% } %>
+            <% } else { %>
+              <div class="rounded-xl bg-amber-900/20 border border-amber-800/50 p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-amber-400">
+                      <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <h3 class="text-sm font-medium text-amber-200">Missing Server ID</h3>
+                    <p class="mt-2 text-sm text-amber-200/70">No server ID was provided in the request.</p>
+                  </div>
+                </div>
+              </div>
+            <% } %>
+            
+          </div>
+        </div>
+      </main>
+      <%- include('../components/footer') %>
     </div>
   </div>
-</div>
-<% } %>
-<div class="bg-bluey-700 px-4 py-5 border-b border-bluey-600 rounded-t sm:px-6">
-<div class="sm:flex sm:items-start sm:justify-between">
-      <div>
-  <h3 class="text-lg leading-6 font-medium text-white">Edit server</h3>
-  <p class="mt-1 text-sm text-bluey-300">If you would like to control the server, run actions, edit files, etc then use the Panel. The link & credentials are on the Account page.</p>
-      </div>
-      <div class="mt-5 sm:mt-0 sm:ml-6 sm:flex-shrink-0 sm:flex sm:items-center">
-        <a href="/cp/delete?id=<%= req.query.id %>" type="button" class="ml-2 inline-flex items-center px-4 py-2 border border-bluey-500 shadow-sm font-medium rounded-md text-red-500 bg-bluey-600 cursor-default sm:text-sm">Delete Server</a>
-      </div>
-    </div>
-</div>
-<div class="bg-bluey-700 rounded-b px-4 py-5 sm:px-6 text-bluey-300 text-sm">
-        <%
-            let ram = 0;
-            let disk = 0;
-            let cpu = 0;
-            let servers = pterodactyl.relationships.servers.data.length;
-            for (let i = 0, len = pterodactyl.relationships.servers.data.length; i < len; i++) {
-                ram = ram + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.memory == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.memory : 0);
-                disk = disk + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.disk == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.disk : 0);
-                cpu = cpu + (typeof pterodactyl.relationships.servers.data[i].attributes.limits.cpu == "number" ? pterodactyl.relationships.servers.data[i].attributes.limits.cpu : 0);
-            }
-        %>
-                                    <% if (req.query.id) { %>
-                                        <% if (pterodactyl.relationships.servers.data.filter(name => name.attributes.id == req.query.id).length == 1) {
-                                            let serverinfo = pterodactyl.relationships.servers.data.filter(name => name.attributes.id == req.query.id)[0];
-                                            let attemptegg = null;
-                                            let attemptname = null;
-                                            for (let [name, value] of Object.entries(settings.api.client.eggs)) {
-                                                if (settings.api.client.eggs[name].info.egg == serverinfo.attributes.egg) {
-                                                    attemptegg = settings.api.client.eggs[name];
-                                                    attemptname = name;
-                                                };
-                                            };
-                                            let egginfo = attemptegg ? attemptegg.display : "???";
-                                        %>
-            <div class="grid grid-cols-3 gap-6">
-              <div class="col-span-3 sm:col-span-2">
-                <label for="company-website" class="block text-sm font-medium text-bluey-400">RAM (GB)</label>
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="ram" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>" value="<%= (packages ? packages.ram : 0)/1024 + extraresources.ram/1024 - ram/1024 + serverinfo.attributes.limits.memory/1024 %>">
-                </div>
-              </div>
-            </div><br>
-
-            <div class="grid grid-cols-3 gap-6">
-              <div class="col-span-3 sm:col-span-2">
-                <label for="company-website" class="block text-sm font-medium text-bluey-400">CPU (%)</label>
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="cpu" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" value="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu + serverinfo.attributes.limits.cpu %>" placeholder="<%= (packages ? packages.cpu : 0) + extraresources.cpu - cpu + serverinfo.attributes.limits.cpu %>">
-                </div>
-              </div>
-            </div><br>
-
-            <div class="grid grid-cols-3 gap-6">
-              <div class="col-span-3 sm:col-span-2">
-                <label for="company-website" class="block text-sm font-medium text-bluey-400">Disk (GB)</label>
-                <div class="mt-1 flex rounded-md shadow-sm">
-                  <input type="text" name="company-website" id="disk" class="transition ease-in-out delay-100 block w-full flex-1 text-white rounded-md bg-bluey-600 border-bluey-500 focus:border-blue-400 focus:ring-blue-400 sm:text-sm" placeholder="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>" value="<%= (packages ? packages.disk : 0)/1024 + extraresources.disk/1024 - disk/1024 + serverinfo.attributes.limits.disk/1024 %>">
-                </div>
-              </div>
-            </div><br><br>
-        <button onclick="submitForm()" class="transition ease-in-out delay-100 group relative flex w-auto justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none">
-          Apply Changes
-        </button>
-                                            </div>
-                                            <script>
-                                                async function submitForm() {
-                                                    let ram = encodeURIComponent(document.getElementById("ram").value);
-                                                    let disk = encodeURIComponent(document.getElementById("disk").value);
-                                                    let cpu = encodeURIComponent(document.getElementById("cpu").value);
-                                                    document.location.href = `/cp/modify?id=<%= req.query.id %>&ram=${ram*1024}&disk=${disk*1024}&cpu=${cpu*100}`;
-                                                };
-                                            </script>
-                                        <% } else { %>
-                                            <p class="text-white">Could not find server with the provided ID.</p>
-                                        <% } %>
-                                    <% } else { %>
-                                        <p class="text-white">Missing server ID.</p>
-                                    <% } %>
-</div>
-      <!-- /End replace -->
-    </div>
-  </main>
-</div>
+</body>

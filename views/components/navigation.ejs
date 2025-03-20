@@ -1,44 +1,682 @@
-<nav class="bg-bluey-800">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div class="flex items-center">
-        <div class="hidden md:block">
-          <div class="flex items-baseline space-x-4">
-            <a href="/cp" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
-           
-            <a href="/cp/servers/new" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Create</a>
+<% 
+/**
+ * Component: Navigation
+ * Filepath: components/navigation.ejs
+ * 
+ * @description This component represents the navigation bar of the application.
+ * It displays different elements based on the value of the 'settings.testing' variable.
+ * If 'settings.testing' is true, it shows a message indicating that the testing phase is active.
+ * The component also includes scripts and stylesheets for external libraries.
+ * It contains a spinner element and a search input field.
+*/
+%>
 
-            <a href="/cp/account" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Account</a>
+<!-- Testing mode -->
+<% if (settings.testing == true ) { %>
+<div class="relative isolate flex items-center gap-x-6 overflow-hidden bg-amber-500 px-6 py-2.5 sm:px-3.5 sm:before:flex-1 z-index">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+    <p class="text-sm leading-6 font-medium text-amber-900">
+      <strong class="font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-amber-900 mr-2 inline-flex">
+          <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+        </svg>
+        Testing phase active
+      </strong><svg viewBox="0 0 2 2" class="mx-2 inline h-0.5 w-0.5 fill-current" aria-hidden="true">
+        <circle cx="1" cy="1" r="1" />
+      </svg>
+      You are currently accessing this dashboard as a tester. Please report any bugs.
+    </p>
+  </div>
+  <div class="flex flex-1 justify-end">
+  </div>
+</div>
+<% } %>
 
-            <a href="/cp/earn" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Earn</a>
+<!-- Begin loading page content, load styles and CDN links -->
+<script src="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/nanobar/0.4.2/nanobar.js"></script>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .alertify-notifier .ajs-message.ajs-success {
+    color: #71747a;
+    padding: 13px 7px;
+    background: #e5e7eb;
+    border-radius: 24px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  .spinner {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    border: 3px solid #474c55;
+    border-radius: 50%;
+    border-top: 3px solid white;
+    width: 22px;
+    height: 22px;
+    -webkit-animation: spin 0.5s linear infinite;
+    animation: spin 0.5s linear infinite;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
 
-            <a href="/cp/store" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Store</a>
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
 
-            <a href="/cp/transfer" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Transfer</a>
-            <% if (pterodactyl.root_admin == true) { %>
-              <a href="/cp/admin" class="transition ease-in-out delay-100 text-bluey-300 hover:bg-bluey-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Admin</a>
-            <% } %>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Global scrollbar styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 82, 91, 0.3) transparent;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(82, 82, 91, 0.3);
+    border-radius: 20px;
+    border: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(82, 82, 91, 0.5);
+  }
+  
+  /* Navigation specific styles */
+  .nav-link {
+    transition: all 0.2s ease;
+    position: relative;
+    background-color: rgba(39, 39, 42, 0.4);
+    border: 1px solid rgba(63, 63, 70, 0.2);
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(63, 63, 70, 0.5);
+    border-color: rgba(82, 82, 91, 0.3);
+  }
+  
+  .nav-link.active {
+    background-color: rgba(79, 70, 229, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: rgba(129, 140, 248, 1);
+  }
+  
+  .nav-link.active svg {
+    color: rgba(129, 140, 248, 1) !important;
+  }
+  
+  .nav-link:hover svg {
+    color: rgba(212, 212, 216, 1) !important;
+  }
+  
+  .sidebar-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .sidebar-heading {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding-left: 0.75rem;
+  }
+  
+  /* Logout button specific styling */
+  .logout-button {
+    background-color: rgba(127, 29, 29, 0.2);
+    border: 1px solid rgba(153, 27, 27, 0.3);
+    color: rgba(248, 113, 113, 0.9);
+    transition: all 0.2s ease;
+  }
+  
+  .logout-button:hover {
+    background-color: rgba(153, 27, 27, 0.3);
+    border-color: rgba(185, 28, 28, 0.4);
+    color: rgba(252, 165, 165, 1);
+  }
+  
+  .logout-button svg {
+    color: rgba(248, 113, 113, 0.7) !important;
+  }
+  
+  .logout-button:hover svg {
+    color: rgba(252, 165, 165, 1) !important;
+  }
+
+  /* Mobile menu button */
+  .mobile-menu-button {
+    display: none;
+  }
+
+  /* Mobile sidebar styles */
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 256px;
+      z-index: 50;
+    }
+    
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    
+    .mobile-menu-button {
+      display: block;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 40;
+      background-color: rgba(39, 39, 42, 0.8);
+      border: 1px solid rgba(63, 63, 70, 0.3);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 40;
+    }
+
+    .mobile-overlay.open {
+      display: block;
+    }
+  }
+</style>
+
+<!-- Mobile menu button -->
+<button id="mobile-menu-button" class="mobile-menu-button text-zinc-300 hover:text-white focus:outline-none">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+  </svg>
+</button>
+
+<!-- Mobile overlay -->
+<div id="mobile-overlay" class="mobile-overlay"></div>
+
+<div id="spinner" class="spinner mt-2 mr-2"></div>
+<!-- Static sidebar for desktop -->
+<div id="sidebar" class="sidebar <% if (settings.testing == true) { %>mt-12 <% } %> md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-10">
+  <!-- Sidebar component -->
+  <div class="flex-1 flex flex-col min-h-0 bg-zinc-900 border-r border-zinc-800 h-full">
+    <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+      <div class="flex items-center flex-shrink-0 px-4 justify-between">
+        <span class="text-zinc-100 text-lg font-semibold tracking-tight"><%= settings.name %></span>
+        <!-- Close button for mobile -->
+        <button id="close-sidebar" class="md:hidden text-zinc-400 hover:text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- User profile section -->
+      <div class="px-4 mt-5 mb-6">
+        <div class="flex items-center p-3 bg-zinc-800/50 rounded-xl border border-zinc-700/30 shadow-lg">
+          <% if (settings.api.client.accountSwitcher !== true) { %>
+          <div class="flex items-center w-full">
+            <img class="h-10 w-10 rounded-lg" src="https://cdn.discordapp.com/avatars/<%= userinfo.id %>/<%= userinfo.avatar %>?size=256" alt="">
+            <div class="ml-3">
+              <p class="text-sm font-medium text-zinc-200"><%= userinfo.global_name %></p>
+              <p class="text-xs text-zinc-400">
+                <% if (typeof packagename.charAt(0) == 'number') { %>
+                <%= packagename %> plan
+                <% } else { %>
+                <%= packagename.charAt(0).toUpperCase() + packagename.slice(1) %> plan
+                <% } %>
+              </p>
+            </div>
+          </div>
+          <% } else { %>
+          <a href="../accounts" class="flex items-center justify-between w-full group transition hover:bg-zinc-700/50 rounded-lg p-2">
+            <div class="flex items-center">
+              <img class="h-10 w-10 rounded-lg" src="https://cdn.discordapp.com/avatars/<%= userinfo.id %>/<%= userinfo.avatar %>?size=256" alt="">
+              <div class="ml-3">
+                <p class="text-sm font-medium text-zinc-200"><%= userinfo.global_name %></p>
+                <p class="text-xs text-zinc-400">
+                  <% if (typeof packagename.charAt(0) == 'number') { %>
+                  <%= packagename %> plan
+                  <% } else { %>
+                  <%= packagename.charAt(0).toUpperCase() + packagename.slice(1) %> plan
+                  <% } %>
+                </p>
+              </div>
+            </div>
+            <div class="text-zinc-400">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                <path fill-rule="evenodd" d="M10.53 3.47a.75.75 0 0 0-1.06 0L6.22 6.72a.75.75 0 0 0 1.06 1.06L10 5.06l2.72 2.72a.75.75 0 1 0 1.06-1.06l-3.25-3.25Zm-4.31 9.81 3.25 3.25a.75.75 0 0 0 1.06 0l3.25-3.25a.75.75 0 1 0-1.06-1.06L10 14.94l-2.72-2.72a.75.75 0 0 0-1.06 1.06Z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </a>
+          <% } %>
+        </div>
+      </div>
+      
+      <!-- Search input -->
+      <div class="px-4 mb-6">
+        <div class="relative">
+          <input placeholder="Search..." id="miniSearchInput" type="text" class="block w-full bg-zinc-800/50 border border-zinc-700/30 rounded-xl py-2 pl-4 pr-10 text-sm text-zinc-300 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <span id="miniSearchButton" class="text-zinc-500 cursor-pointer">/</span>
           </div>
         </div>
       </div>
-      <div class="hidden md:block">
-        <div class="ml-4 flex items-center md:ml-6">
-          <span class="text-blue-300 mr-2 bg-blue-900/50 p-2 text-sm px-6 rounded-full"><%= coins %> Coins</span> <!-- Profile dropdown -->
-          <div x-data="{show: false}" x-on:click.away="show = false" class="ml-3 relative">
-            <div>
-              <button x-on:click="show = !show" type="button" class="max-w-xs bg-bluey-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-bluey-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                <span class="sr-only">Open user menu</span>
-                <img class="h-8 w-8 rounded-full" src="https://cdn.discordapp.com/avatars/<%= req.session.userinfo.id%>/<%= req.session.userinfo.avatar%>.jpg?size=1024" alt="">
-              </button>
-            </div>
-            <div x-show="show" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-bluey-700 ring-1 ring-bluey-600 ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
-              <a href="/cp/account" class="block px-4 py-2 text-sm text-bluey-300 role="menuitem" tabindex="-1" id="user-menu-item-0">Account</a>
 
-              <a href="/cp/logout" class="block px-4 py-2 text-sm text-red-500" role="menuitem" tabindex="-1" id="user-menu-item-2">Logout</a>
-            </div>
+      <div class="pb-2"></div>
+      <!-- Navigation links -->
+      <div class="flex-1 overflow-y-auto py-0">
+        <nav class="space-y-2 px-3">
+          <a href="../dashboard" class="nav-link group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-slate-500 group-hover:text-indigo-400">
+              <rect width="7" height="9" x="3" y="3" rx="1"/>
+              <rect width="7" height="5" x="14" y="3" rx="1"/>
+              <rect width="7" height="9" x="14" y="12" rx="1"/>
+              <rect width="7" height="5" x="3" y="16" rx="1"/>
+            </svg>
+            Dashboard
+          </a>
+          
+          <a href="../servers" class="nav-link group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-3 text-slate-500 group-hover:text-indigo-400">
+              <path d="M4.08 5.227A3 3 0 016.979 3H17.02a3 3 0 012.9 2.227l2.113 7.926A5.228 5.228 0 0018.75 12H5.25a5.228 5.228 0 00-3.284 1.153L4.08 5.227z" />
+              <path fill-rule="evenodd" d="M5.25 13.5a3.75 3.75 0 100 7.5h13.5a3.75 3.75 0 100-7.5H5.25zm10.5 4.5a.75.75 0 100-1.5.75.75 0 000 1.5zm3.75-.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" clip-rule="evenodd" />
+            </svg>
+            Servers
+          </a>
+          
+          <a href="../security" class="nav-link group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-3 text-slate-500 group-hover:text-indigo-400">
+              <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+            </svg>
+            Security
+          </a>
+
+          <% if (settings.api.afk.enabled == true) { %>
+          <a href="../afk" class="nav-link group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-3 text-slate-500 group-hover:text-indigo-400">
+              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
+            </svg>
+            AFK Page
+          </a>
+          <% } %>
+
+          <% if (settings.api.client.coins.store.enabled == true) { %>
+            <a href="/store" class="nav-link group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-slate-800/50 hover:bg-slate-700 text-slate-300 hover:text-indigo-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-slate-500 group-hover:text-indigo-400">
+                <circle cx="8" cy="21" r="1"/>
+                <circle cx="19" cy="21" r="1"/>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+              </svg>
+              Store
+            </a>
+          <% } %>
+
+          <a href="../logout" class="nav-link logout-button group flex items-center px-3 py-2 text-sm font-medium rounded-lg mb-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 mr-3">
+              <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M19 10a.75.75 0 0 0-.75-.75H8.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 19 10Z" clip-rule="evenodd" />
+            </svg>
+            Sign out
+          </a>
+
+          <% if (pterodactyl.root_admin == true) { %>
+          <div class="sidebar-section space-y-2">
+            <p class="sidebar-heading text-zinc-500 flex items-center">
+              Admin Access
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 ml-1.5 text-zinc-500">
+                <path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" />
+              </svg>
+            </p>
+            
+            <a href="../admin" class="nav-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white mb-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300">
+                <path d="M2 21a8 8 0 0 1 13.292-6"/>
+                <circle cx="10" cy="8" r="5"/>
+                <path d="m16 19 2 2 4-4"/>
+              </svg>
+              Admin Panel
+            </a>
+            
+            <a href="../settings" class="nav-link group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-zinc-300 hover:bg-zinc-800 hover:text-white mb-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-zinc-400 group-hover:text-zinc-300">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              Settings
+            </a>
           </div>
-        </div>
+          <% } %>
+        </nav>
       </div>
     </div>
   </div>
-</nav>
+</div>
+
+<!-- Search system -->
+<%- include('../components/search') %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Mobile menu functionality
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const closeSidebarButton = document.getElementById('close-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    
+    // Function to open sidebar
+    function openSidebar() {
+      sidebar.classList.add('open');
+      mobileOverlay.classList.add('open');
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when sidebar is open
+    }
+    
+    // Function to close sidebar
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      mobileOverlay.classList.remove('open');
+      document.body.style.overflow = ''; // Re-enable scrolling
+    }
+    
+    // Event listeners
+    mobileMenuButton.addEventListener('click', openSidebar);
+    closeSidebarButton.addEventListener('click', closeSidebar);
+    mobileOverlay.addEventListener('click', closeSidebar);
+    
+    // Close sidebar when window is resized to desktop size
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        closeSidebar();
+      }
+    });
+
+    // Active link detection
+    var currentPageUrl = window.location.href;
+    var navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(function(link) {
+      var linkUrl = link.getAttribute('href');
+      
+      if (currentPageUrl.includes(linkUrl.replace('../', '/'))) {
+        // Remove default classes
+        link.className = 'nav-link';
+        
+        // Add active state classes
+        link.classList.add(
+          'group', 
+          'flex', 
+          'items-center', 
+          'px-4', 
+          'py-3', 
+          'text-sm', 
+          'font-medium', 
+          'rounded-xl', 
+          'transition-all', 
+          'duration-200', 
+          'bg-indigo-900/40', 
+          'text-indigo-400'
+        );
+        
+        // Find the SVG inside this link and change its color
+        var svg = link.querySelector('svg');
+        if (svg) {
+          svg.classList.remove('text-slate-500');
+          svg.classList.add('text-indigo-400');
+        }
+      }
+    });
+  });
+</script>
+
+<script>
+  var options = {
+    classname: 'loadingbar',
+    id: 'loadingbar'
+  };
+  var nanobar = new Nanobar(options);
+  // Show the spinner with a smooth transition
+  var spinner = document.getElementById('spinner');
+  spinner.style.opacity = '1';
+  // Simulate a slower loading progress
+  function simulateLoading() {
+    nanobar.go(10); // Change this value to control the loading speed
+    setTimeout(function() {
+      nanobar.go(50);
+    }, 190); // Delay the progress update
+    setTimeout(function() {
+      nanobar.go(100);
+      // Hide the spinner with a smooth transition
+      spinner.style.opacity = '0';
+    }, 400); // Another delay
+  }
+  simulateLoading();
+</script>
+
+<style>
+  .loadingbar .bar {
+    background: #515661;
+    -webkit-box-shadow: 0px 4px 38px -15px rgba(0, 0, 0, 0.87);
+    -moz-box-shadow: 0px 4px 38px -15px rgba(0, 0, 0, 0.87);
+    box-shadow: 0px 4px 38px -15px rgba(0, 0, 0, 0.87);
+    height: 1.85px;
+  }
+</style>
+
+<style>
+  #skeleton-loader {
+    display: none;
+  }
+
+  #skeleton-loader.active {
+    display: block;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Get references to the skeleton loader and content elements
+    const skeletonLoader = document.getElementById("skeleton-loader");
+    const content = document.getElementById("content");
+
+    // Function to show the skeleton loader and hide the content
+    function showSkeletonLoader() {
+      skeletonLoader.classList.add("active");
+      content.style.display = "none";
+    }
+
+    // Function to hide the skeleton loader and show the content
+    function hideSkeletonLoader() {
+      skeletonLoader.classList.remove("active");
+      content.style.display = "block";
+    }
+
+    // Show the skeleton loader immediately (initial state)
+    showSkeletonLoader();
+    setTimeout(hideSkeletonLoader, 250);
+  });
+</script>
+
+<style>
+  .hidden {
+    display: none;
+  }
+
+  .modal {
+    display: none;
+    /* Initially hide the modal */
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .newAccountModal {
+    position: fixed;
+    z-index: 50;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .newAccountContent {
+    transition: opacity 0.2s ease-in-out;
+    /* Added transition for opacity */
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 48px;
+    width: 30%;
+    border-radius: 24px;
+  }
+
+  .modal-content {
+    opacity: 0;
+    /* Initially hide the modal content */
+    transition: opacity 0.2s ease-in-out;
+    /* Added transition for opacity */
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 48px;
+    width: 30%;
+    border-radius: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .modal-content {
+      width: 80%;
+    }
+  }
+
+  .modal.show {
+    display: block;
+    /* Show the modal when it has the 'show' class */
+  }
+
+  .modal-content.visible {
+    opacity: 1;
+    /* Show the modal content when it has the 'visible' class */
+  }
+</style>
+
+<style>
+  /* Global scrollbar styling */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 82, 91, 0.3) transparent;
+  }
+  
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(82, 82, 91, 0.3);
+    border-radius: 20px;
+    border: transparent;
+  }
+  
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(82, 82, 91, 0.5);
+  }
+  
+  /* Custom scrollbar class for specific elements */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 82, 91, 0.3) transparent;
+    -ms-overflow-style: auto;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(82, 82, 91, 0.3);
+    border-radius: 20px;
+    border: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(82, 82, 91, 0.5);
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* For the main content area */
+  body, html {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 82, 91, 0.3) transparent;
+  }
+  
+  body::-webkit-scrollbar, html::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  body::-webkit-scrollbar-track, html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  body::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb {
+    background-color: rgba(82, 82, 91, 0.3);
+    border-radius: 20px;
+  }
+  
+  body::-webkit-scrollbar-thumb:hover, html::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(82, 82, 91, 0.5);
+  }
+</style>
