@@ -1,29 +1,45 @@
+/**
+ * |-| [- |_ | /\ ( ~|~ `/ |_
+ *
+ * Heliactyl 14.11.1 ― Cascade Ridge 
+ *
+ * This file represents the main entry point of the Heliactyl application.
+ * It loads the necessary packages, settings, and databases.
+ * It also handles the routing and rendering of web pages.
+ * @module index
+ */
+
 "use strict";
 
-// Load packages.
-const fs = require("fs");
-const chalk = require("chalk");
-const arciotext = require("./handlers/afk.js");
-const cluster = require("cluster");
-const chokidar = require('chokidar');
+// Load logging.
+require("./misc/console.js")();
 
+// Load packages.
+const path = require("path");
+const fs = require("fs");
+const fetch = require("node-fetch");
+const chalk = require("chalk");
+const axios = require("axios");
+const arciotext = require("./misc/afk.js");
+const cluster = require("cluster");
+const os = require("os");
+const ejs = require("ejs")
+const cron = require('node-cron');
 global.Buffer = global.Buffer || require("buffer").Buffer;
 
 if (typeof btoa === "undefined") {
   global.btoa = function (str) {
-    return Buffer.from(str, "binary").toString("base64");
+    return new Buffer(str, "binary").toString("base64");
   };
 }
 if (typeof atob === "undefined") {
   global.atob = function (b64Encoded) {
-    return Buffer.from(b64Encoded, "base64").toString("binary");
+    return new Buffer(b64Encoded, "base64").toString("binary");
   };
 }
 
 // Load settings.
-const loadConfig = require("./handlers/config");
-const settings = loadConfig("./config.toml");
-
+const settings = require("./settings.json");
 
 const defaultthemesettings = {
   index: "index.ejs",
@@ -31,141 +47,66 @@ const defaultthemesettings = {
   redirect: {},
   pages: {},
   mustbeloggedin: [],
+  mustbeadmin: [],
   variables: {},
 };
 
-/**
- * Renders data for the theme.
- * @param {Object} req - The request object.
- * @param {Object} theme - The theme object.
- * @returns {Promise<Object>} The rendered data.
- */
-async function renderdataeval(req, theme) {
-  const JavaScriptObfuscator = require('javascript-obfuscator');
-  let settings = loadConfig("./config.toml");
-  let renderdata = {
-    req: req,
-    settings: settings,
-    userinfo: req.session.userinfo,
-    queued: (req.session.userinfo ? await db.get(req.session.userinfo.id + '-queued') : { }),
-    packagename: req.session.userinfo ? await db.get("package-" + req.session.userinfo.id) ? await db.get("package-" + req.session.userinfo.id) : settings.api.client.packages.default : null,
-    extraresources: !req.session.userinfo ? null : (await db.get("extra-" + req.session.userinfo.id) ? await db.get("extra-" + req.session.userinfo.id) : {
-      ram: 0,
-      disk: 0,
-      cpu: 0,
-      servers: 0
-    }),
-    packages: req.session.userinfo ? settings.api.client.packages.list[await db.get("package-" + req.session.userinfo.id) ? await db.get("package-" + req.session.userinfo.id) : settings.api.client.packages.default] : null,
-    coins: settings.api.client.coins.enabled == true ? (req.session.userinfo ? (await db.get("coins-" + req.session.userinfo.id) ? await db.get("coins-" + req.session.userinfo.id) : 0) : null) : null,
-    bal: (req.session.userinfo ? (await db.get("bal-" + req.session.userinfo.id) ? await db.get("bal-" + req.session.userinfo.id) : 0) : null),
-    pterodactyl: req.session.pterodactyl,
-    extra: theme.settings.variables,
-    db: db
-  };
-  renderdata.arcioafktext = JavaScriptObfuscator.obfuscate(`
-    let everywhat = ${settings.api.afk.every};
-    let gaincoins = ${settings.api.afk.coins};
-    let wspath = "ws";
+module.exports.renderdataeval = `(async () => {
+   const JavaScriptObfuscator = require('javascript-obfuscator');
+   let newsettings = JSON.parse(require("fs").readFileSync("./settings.json"));
+    let renderdata = {
+      req: req,
+      settings: newsettings,
+      userinfo: req.session.userinfo,
+      packagename: req.session.userinfo ? await db.get("package-" + req.session.userinfo.id) ? await db.get("package-" + req.session.userinfo.id) : newsettings.api.client.packages.default : null,
+      extraresources: !req.session.userinfo ? null : (await db.get("extra-" + req.session.userinfo.id) ? await db.get("extra-" + req.session.userinfo.id) : {
+        ram: 0,
+        disk: 0,
+        cpu: 0,
+        servers: 0
+      }),
+      packages: req.session.userinfo ? newsettings.api.client.packages.list[await db.get("package-" + req.session.userinfo.id) ? await db.get("package-" + req.session.userinfo.id) : newsettings.api.client.packages.default] : null,
+      coins: newsettings.api.client.coins.enabled == true ? (req.session.userinfo ? (await db.get("coins-" + req.session.userinfo.id) ? await db.get("coins-" + req.session.userinfo.id) : 0) : null) : null,
+      x: 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1wVGZKZm5pUUZTOA==',
+      pterodactyl: req.session.pterodactyl,
+      extra: theme.settings.variables,
+      db: db
+    };
+    renderdata.arcioafktext = JavaScriptObfuscator.obfuscate(\`
+      let everywhat = \${newsettings.api.afk.every};
+      let gaincoins = \${newsettings.api.afk.coins};
+      let wspath = "ws";
 
-    ${arciotext}
-  `).getObfuscatedCode();
-  return renderdata;
-}
-
-module.exports.renderdataeval = renderdataeval;
+      \${arciotext}
+    \`);
+    return renderdata;
+  })();`;
 
 // Load database
-const Database = require("keyv");
-const db = new Database(settings.database);
+const Keyv = require("keyv");
+const db = new Keyv(settings.database);
 
-module.exports.db = db;
+db.on("error", (err) => {
+  console.log(
+    chalk.red(
+      "Database ― An error has occurred when attempting to access the SQLite database."
+    )
+  );
+});
 
 if (cluster.isMaster) {
-  // Display loading spinner
-  let spinnerFrames = ['-', '\\', '|', '/'];
-  let currentFrame = 0;
-  
-  const spinner = setInterval(() => {
-    process.stdout.write(chalk.gray('\r' + spinnerFrames[currentFrame++] + ' Working on it...'));
-    currentFrame %= spinnerFrames.length;
-  }, 100);
-  
-  setTimeout(() => {
-    clearInterval(spinner);
-    process.stdout.write('\r');
-    startApp();
-  }, 3000);
+  const numCPUs = 8;
+  console.log(chalk.gray('Starting workers on Heliactyl 14 (Cascade Ridge)'))
+  console.log(chalk.gray(`Master ${process.pid} is running`));
+  console.log(chalk.gray(`Forking ${numCPUs} workers...`));
 
-  function startApp() {
-    // Create tree view of modules in /modules/
-    let moduleFiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
-    const settingsVersion = settings.version;
-  
-    console.log(chalk.gray("Loading modules tree..."));
-    console.log(chalk.gray("Version: " + settingsVersion));
-
-    let modulesTable = [];
-
-    moduleFiles.forEach(file => {
-      const module = require('./modules/' + file);
-      if (!module.load || !module.plexactylModule) {
-        modulesTable.push({ File: file, Name: 'Unknown', 'Target Platform': 'Unknown' });
-        return;
-      }
-    
-      const { name, target_platform } = module.plexactylModule;
-  
-      modulesTable.push({ File: file, Name: name, 'Target Platform': target_platform });
-    });
-
-    console.table(modulesTable);
-  
-    const numCPUs = settings.clusters;
-    console.log(chalk.gray('Starting workers on Plexactyl ' + settings.version));
-    console.log(chalk.gray(`Master ${process.pid} is running`));
-    console.log(chalk.gray(`Forking ${numCPUs} workers...`));
-  
-    if (numCPUs > 48 || numCPUs < 1) {
-      console.log(chalk.red('Error: Clusters amount was either below 1, or above 48.'))
-      process.exit()
-    }
-
-    for (let i = 0; i < numCPUs; i++) {
-      cluster.fork();
-    }
-  
-    cluster.on('exit', (worker, code, signal) => {
-      console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
-      cluster.fork();
-    });
-    
-    // Watch for file changes and reboot workers
-    const watcher = chokidar.watch('./modules');
-    watcher.on('change', (path) => {
-      console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-      for (const id in cluster.workers) {
-        cluster.workers[id].kill();
-      }
-    });
-
-    // Watch for file changes and reboot workers
-    const watcher2 = chokidar.watch('./config.toml');
-    watcher2.on('change', (path) => {
-      console.log(chalk.yellow(`File changed: ${path}. Rebooting workers...`));
-      for (const id in cluster.workers) {
-        cluster.workers[id].kill();
-      }
-    });
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
   }
-  
-  cluster.on('online', (worker) => {
-    const workerTree = Object.values(cluster.workers).map(worker => ({
-      id: worker.id,
-      pid: worker.process.pid,
-      state: worker.state,
-    }));
-    console.log(chalk.gray('Current workers status:'));
-    console.table(workerTree);
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(chalk.red(`Worker ${worker.process.pid} died. Forking a new worker...`));
+    cluster.fork();
   });
 
 } else {
@@ -176,26 +117,26 @@ if (cluster.isMaster) {
   require("express-ws")(app);
 
   // Load express addons.
+  const ejs = require("ejs");
   const session = require("express-session");
-  const SessionStore = require("./handlers/session");
+  const KeyvStore = require("./session");
   const indexjs = require("./app.js");
-  let secret = (Math.random() + 1).toString(36).substring(7);
 
   // Load the website.
   module.exports.app = app;
 
   app.use((req, res, next) => {
-    res.setHeader("X-Powered-By", "Plexactyl");
+    res.setHeader("X-Powered-By", "14th Gen Heliactyl (Cascade Ridge)");
     next();
   });
 
   app.use(
     session({
-      store: new SessionStore({ uri: settings.database }),
-      secret: secret,
+      store: new KeyvStore({ uri: settings.database }),
+      secret: settings.website.secret,
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: false }, // Set to true if using https
+      cookie: { secure: false },
     })
   );
 
@@ -210,17 +151,15 @@ if (cluster.isMaster) {
     })
   );
 
-  const listener = app.listen(settings.website.port, async function () {
-    /* clear all afk sessions */
-    await db.set('afkSessions', {});
+  const listener = app.listen(settings.website.port, function () {
     console.log(
-      chalk.white("Web cluster is now ") + chalk.green('online')
+      chalk.white("State updated: ") + chalk.green('online')
     );
   });
 
   var cache = false;
   app.use(function (req, res, next) {
-    let manager = loadConfig("./config.toml").api
+    let manager = JSON.parse(fs.readFileSync("./settings.json").toString()).api
       .client.ratelimits;
     if (manager[req._parsedUrl.pathname]) {
       if (cache == true) {
@@ -249,10 +188,10 @@ if (cluster.isMaster) {
   });
 
   // Load the API files.
-  let apifiles = fs.readdirSync("./modules").filter((file) => file.endsWith(".js"));
+  let apifiles = fs.readdirSync("./api").filter((file) => file.endsWith(".js")); //UzJsdVoxUnBibTg9IHdhcyByaWdodA==
 
   apifiles.forEach((file) => {
-    let apifile = require(`./modules/${file}`);
+    let apifile = require(`./api/${file}`);
     apifile.load(app, db);
   });
 
@@ -262,21 +201,110 @@ if (cluster.isMaster) {
         req.session.pterodactyl.id !==
         (await db.get("users-" + req.session.userinfo.id))
       )
-        return res.redirect("/cp/login?prompt=none");
+        return res.redirect("/login?prompt=none");
     let theme = indexjs.get(req);
-    let settings = loadConfig("./config.toml");
-    if (settings.api.afk.enabled == true)
+    let newsettings = JSON.parse(require("fs").readFileSync("./settings.json"));
+    if (newsettings.api.afk.enabled == true)
       req.session.arcsessiontoken = Math.random().toString(36).substring(2, 15);
     if (theme.settings.mustbeloggedin.includes(req._parsedUrl.pathname))
       if (!req.session.userinfo || !req.session.pterodactyl)
         return res.redirect(
-          "/cp/login" +
+          "/login" +
             (req._parsedUrl.pathname.slice(0, 1) == "/"
               ? "?redirect=" + req._parsedUrl.pathname.slice(1)
               : "")
         );
-    const data = await renderdataeval(req, theme);
-    res.render(theme.settings.pages[req._parsedUrl.pathname.slice(1)] || theme.settings.notfound, data);
+    if (theme.settings.mustbeadmin.includes(req._parsedUrl.pathname)) {
+      ejs.renderFile(
+        `./views/${theme.settings.notfound}`,
+        await eval(indexjs.renderdataeval),
+        null,
+        async function (err, str) {
+          delete req.session.newaccount;
+          delete req.session.password;
+          if (!req.session.userinfo || !req.session.pterodactyl) {
+            if (err) {
+              console.log(err);
+              return res.render("500.ejs", { err });
+            }
+            res.status(200);
+            return res.send(str);
+          }
+  
+          let cacheaccount = await fetch(
+            settings.pterodactyl.domain +
+              "/api/application/users/" +
+              (await db.get("users-" + req.session.userinfo.id)) +
+              "?include=servers",
+            {
+              method: "get",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${settings.pterodactyl.key}`,
+              },
+            }
+          );
+          if ((await cacheaccount.statusText) == "Not Found") {
+            if (err) {
+              console.log(err);
+              return res.render("500.ejs", { err });
+            }
+            return res.send(str);
+          }
+          let cacheaccountinfo = JSON.parse(await cacheaccount.text());
+  
+          req.session.pterodactyl = cacheaccountinfo.attributes;
+          if (cacheaccountinfo.attributes.root_admin !== true) {
+            if (err) {
+              console.log(err);
+              return res.render("500.ejs", { err });
+            }
+            return res.send(str);
+          }
+  
+          ejs.renderFile(
+            `./views/${
+              theme.settings.pages[req._parsedUrl.pathname.slice(1)]
+                ? theme.settings.pages[req._parsedUrl.pathname.slice(1)]
+                : theme.settings.notfound
+            }`,
+            await eval(indexjs.renderdataeval),
+            null,
+            function (err, str) {
+              delete req.session.newaccount;
+              delete req.session.password;
+              if (err) {
+                console.log(err);
+                return res.render("500.ejs", { err });
+              }
+              res.status(200);
+              res.send(str);
+            }
+          );
+        }
+      );
+      return;
+    }
+    const data = await eval(indexjs.renderdataeval);
+    ejs.renderFile(
+      `./views/${
+        theme.settings.pages[req._parsedUrl.pathname.slice(1)]
+          ? theme.settings.pages[req._parsedUrl.pathname.slice(1)]
+          : theme.settings.notfound
+      }`,
+      data,
+      null,
+      function (err, str) {
+        delete req.session.newaccount;
+        delete req.session.password;
+        if (err) {
+          console.log(err);
+          return res.render("500.ejs", { err });
+        }
+        res.status(200);
+        res.send(str);
+      }
+    );
   });
 
   module.exports.get = function (req) {
@@ -306,4 +334,28 @@ if (cluster.isMaster) {
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   });
+
+  process.on('renewalError', (error) => {
+    console.error(chalk.red('Renewal System Error:'), error);
+  });
 }
+
+async function renderTemplate(theme, renderdataeval, req, res, db) {
+  return new Promise(async (resolve, reject) => {
+    ejs.renderFile(
+      `./views/${theme.settings.index}`,
+      await eval(renderdataeval),
+      null,
+      async function (err, str) {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        delete req.session.newaccount;
+        resolve(str);
+      }
+    );
+  });
+}
+
